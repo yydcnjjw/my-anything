@@ -1,7 +1,6 @@
 #pragma once
 
 #include <core/core.hpp>
-#include <service/complete_service.hpp>
 
 namespace my {
 class KeyBind;
@@ -10,7 +9,7 @@ public:
   SHARED_CLS(Command)
 
   using executor = std::function<void()>;
-  using keybind_ptr_t = std::shared_ptr<KeyBind>;
+  using keybind_ptr_t = KeyBind *;
   using keybind_container_t = std::vector<keybind_ptr_t>;
 
   template <typename _Executor>
@@ -20,8 +19,9 @@ public:
 
   ~Command();
 
-  template <typename... Args> void exec(Args &&...args) {
-    _ex(std::forward<Args>(args)...);
+  template <typename... Args> auto exec(Args &&...args) {
+    SPDLOG_DEBUG("exec: {}", this->name());
+    return _ex(std::forward<Args>(args)...);
   }
 
   std::string const &name() const { return this->_name; }
@@ -41,10 +41,11 @@ private:
 
 class CommandService {
 public:
-  UNIQUE_CLS(CommandService)
+  SELF_T(CommandService)
+
   using command_container_t = std::map<std::string, Command::ptr_t>;
 
-  CommandService() {}
+  CommandService() = default;
 
   template <typename... Args, typename = std::enable_if_t<!std::conjunction_v<
                                   std::is_same<Command::ptr_t, Args>...>>>
@@ -55,13 +56,16 @@ public:
   self_t &add(Command::ptr_t const &cmd) {
     if (!this->_commands.emplace(cmd->name(), cmd).second) {
       SPDLOG_WARN("Command {} has been registered", cmd->name());
+    } else {
+      SPDLOG_DEBUG("add Command {}", cmd->name());
     }
     return *this;
   }
 
   std::optional<Command::ptr_t> get_command(std::string const &name) {
-    if (this->_commands.count(name)) {
-      return this->_commands.at(name);
+    auto it = this->_commands.find(name);
+    if (it != this->_commands.end()) {
+      return it->second;
     } else {
       return std::nullopt;
     }
@@ -69,7 +73,7 @@ public:
 
   auto match_command(std::string const &text) {
     return this->_commands | std::views::filter([text](auto const &kv) {
-             return !text.empty() && kv.first.starts_with(text);
+             return kv.first.starts_with(text);
            }) |
            std::views::transform([](auto const &kv) { return kv.second; });
   }
@@ -80,20 +84,25 @@ private:
   command_container_t _commands;
 };
 
-class CommandCompleteBackend : public CompleteBackend {
-public:
-  SHARED_CLS(CommandCompleteBackend)
-  
-  std::string const &name() const override { return this->_name; }
+// class CommandCompleteBackend : public CompleteBackend {
+// public:
+//   SELF_T(CommandCompleteBackend)
 
-  std::string const &complete_prefix() override {
-    return this->_complete_prefix;
-  }
-  void complete(std::string const &text, complete_list &list) override;
+//   CommandCompleteBackend(CommandService &command_srv)
+//       : _command_srv(command_srv) {}
 
-private:
-  std::string _name{"command"};
-  std::string _complete_prefix{">"};
-};
+//   std::string const &name() const override { return this->_name; }
+
+//   std::string const &complete_prefix() override {
+//     return this->_complete_prefix;
+//   }
+
+//   complete_list complete(std::string const &text) override;
+
+// private:
+//   std::string _name{"command"};
+//   std::string _complete_prefix{">"};
+//   CommandService &_command_srv;
+// };
 
 } // namespace my

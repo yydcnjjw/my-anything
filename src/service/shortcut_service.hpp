@@ -7,20 +7,16 @@
 namespace my {
 class KeyMap;
 
-class KeyBind : public std::enable_shared_from_this<KeyBind> {
+class KeyBind {
 public:
   SHARED_CLS(KeyBind)
   using keymap_ptr_t = std::shared_ptr<const KeyMap>;
 
-  KeyBind(keymap_ptr_t const &keymap, QKeySequence const &,
-          std::string const &cmd_name);
-  KeyBind(keymap_ptr_t const &keymap, std::string const &keyseq_str,
-          std::string const &cmd_name);
   KeyBind(keymap_ptr_t const &keymap, QKeySequence const &keyseq,
-          Command::ptr_t cmd)
+          Command::ptr_t const &cmd)
       : _keymap(keymap), _keyseq(keyseq), _cmd(cmd) {}
 
-  ~KeyBind() { this->cmd()->remove_keybind(this->shared_from_this()); }
+  ~KeyBind() { this->cmd()->remove_keybind(this); }
 
   QKeySequence const &keyseq() const { return this->_keyseq; }
 
@@ -38,6 +34,12 @@ public:
 
   keymap_ptr_t const &keymap() { return this->_keymap; }
 
+  std::string str() const {
+    return (boost::format("KeyBind{%s, %s}") %
+            _keyseq.toString().toStdString() % _cmd->name())
+        .str();
+  }
+
 private:
   std::shared_ptr<const KeyMap> _keymap;
   QKeySequence _keyseq;
@@ -45,35 +47,26 @@ private:
 
   friend class Command;
   void cmd(Command::ptr_t const &cmd) { this->_cmd = cmd; }
-  friend class KeyMap;
-
-  void map_to_cmd() { this->_cmd->add_keybind(this->shared_from_this()); }
 };
 
 using keybind_container_t = std::unordered_map<std::string, KeyBind::ptr_t>;
 
+class ShortcutService;
 class KeyMap : public std::enable_shared_from_this<KeyMap> {
 public:
   SHARED_CLS(KeyMap)
 
-  template <typename... Args> KeyMap(std::string const &name) : _name(name) {
-  }
+  KeyMap(ShortcutService &srv, std::string const &name)
+      : _srv(srv), _name(name) {}
 
   std::string const &name() const { return this->_name; }
   keybind_container_t const &map() const { return this->_keybinds; }
 
-  template <typename... Args,
-            typename = std::enable_if_t<!std::conjunction_v<
-                std::is_same<KeyBind::ptr_t, std::decay_t<Args>>...>>>
-  ptr_t add(Args &&...args) {
-    auto kb{
-        KeyBind::make(this->shared_from_this(), std::forward<Args>(args)...)};
-    kb->map_to_cmd();
-    return this->add(kb);
-  }
+  ptr_t add(std::string const &keyseq, std::string const &cmd);
+
+  ptr_t add(QKeySequence const &keyseq, std::string const &cmd);
 
   ptr_t add(KeyBind::ptr_t const &keybind) {
-
     for (auto &item : this->_keybinds) {
       if (item.second->keyseq().matches(keybind->keyseq()) ==
           QKeySequence::PartialMatch) {
@@ -88,18 +81,28 @@ public:
     return this->shared_from_this();
   }
 
+  std::string str() const {
+    std::stringstream ss;
+    ss << "KeyMap{name: " << this->_name << std::endl;
+    for (auto &kb : this->_keybinds) {
+      ss << kb.second->str() << std::endl;
+    }
+    ss << "}" << std::endl;
+    return ss.str();
+  }
+
 private:
+  ShortcutService &_srv;
   std::string _name; // unique id
   keybind_container_t _keybinds;
 };
 
 class ShortcutService {
 public:
+  SELF_T(ShortcutService)
   using keymap_container_t = std::unordered_map<std::string, KeyMap::ptr_t>;
 
-  UNIQUE_CLS(ShortcutService)
-
-  ShortcutService() = default;
+  ShortcutService(CommandService &command_srv) : _command_srv(command_srv) {}
 
   struct KeyBindCandidate {
     std::optional<KeyBind::ptr_t> exact_match;
@@ -203,13 +206,19 @@ public:
     return true;
   }
 
-  void map(KeyMap::ptr_t keymap) {
-    this->_keymaps.emplace(keymap->name(), keymap);
+  template <typename... Args> auto make_keymap(Args &&...args) {
+    return KeyMap::make(*this, std::forward<Args>(args)...);
   }
 
+  void map(KeyMap::ptr_t const &keymap) {
+    SPDLOG_DEBUG("map: {}", keymap->str());
+    this->_keymaps.emplace(keymap->name(), keymap);
+  }
   void unmap(std::string const &name) { this->_keymaps.erase(name); }
 
 private:
+  CommandService &_command_srv;
+  friend class KeyMap;
   keymap_container_t _keymaps;
   QKeySequence _cur_keyseq;
 };

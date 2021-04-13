@@ -16,14 +16,15 @@ void Command::add_keybind(keybind_ptr_t const &kb) {
   this->_keybinds.push_back(kb);
 }
 void Command::remove_keybind(keybind_ptr_t const &kb) {
-  std::erase_if(this->_keybinds, [&kb](auto &p) { return &p == &kb; });
+  std::erase(this->_keybinds, kb);
 }
 
 class CommandCompleteItem : public CompleteItem {
 public:
   SHARED_CLS(CommandCompleteItem)
 
-  CommandCompleteItem(Command::ptr_t const &cmd) : _cmd(cmd) {}
+  CommandCompleteItem(Command::ptr_t const &cmd)
+      : CompleteItem(cmd->name()), _cmd(cmd) {}
 
   std::string const &desc() override {
     std::stringstream ss;
@@ -45,23 +46,21 @@ public:
     return this->_desc;
   }
 
-  void exec() override { this->_cmd->exec(); }
-
 private:
   Command::ptr_t _cmd;
-  std::string _desc;
 };
 
-void CommandCompleteBackend::complete(std::string const &text,
-                                      complete_list &list) {
-  std::ranges::copy(App::get().command_srv().match_command(text) |
-                        std::views::filter([](auto const &cmd) {
-                          return !cmd->name().starts_with("_");
-                        }) |
-                        std::views::transform([](auto const &cmd) {
-                          return CommandCompleteItem::make(cmd);
-                        }),
-                    std::back_inserter(list));
-}
+// complete_list CommandCompleteBackend::complete(std::string const &text) {
+//   complete_list list;
+//   std::ranges::copy(this->_command_srv.match_command(text) |
+//                         std::views::filter([](auto const &cmd) {
+//                           return !cmd->name().starts_with("_");
+//                         }) |
+//                         std::views::transform([](auto const &cmd) {
+//                           return CommandCompleteItem::make(cmd);
+//                         }),
+//                     std::back_inserter(list));
+//   return list;
+// }
 
 } // namespace my

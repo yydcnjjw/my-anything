@@ -6,9 +6,8 @@
 #include <QScreen>
 #include <QVBoxLayout>
 
-#include <app.hpp>
-
 namespace {
+using namespace my;
 struct Commands {
   static auto constexpr kBeginningOfLine{"_beginning-of-line"};
   static auto constexpr kEndOfLine{"_end-of-line"};
@@ -23,15 +22,47 @@ struct Commands {
   static auto constexpr kBackwardWord{"_backward-word"};
   static auto constexpr kFrowardDelete{"_forward-delete"};
 };
+
+class CmdLineInteractiveBackend : public CompleteService::InteractiveBackend {
+public:
+  SHARED_CLS(CmdLineInteractiveBackend)
+  CmdLineInteractiveBackend(CmdLine &cmdline) : _cmdline(cmdline) {}
+
+  void update_items(CompleteService::CompleteCtx::ptr_t const &ctx) override {
+    _cmdline.set_text(ctx->input());
+    _cmdline.set_complete_list(ctx->candidates());
+  }
+
+  void clear_items() override {
+    _cmdline.set_text("");
+    _cmdline.set_complete_list(std::ranges::empty_view<CompleteItem::ptr_t>{});
+  }
+
+  rx::observable<std::string> text_changed() override {
+    return _cmdline.text_changed();
+  }
+
+  rx::observable<int> item_selected() override {
+    return _cmdline.item_selected();
+  }
+
+private:
+  CmdLine &_cmdline;
+};
+
 } // namespace
 
 namespace my {
 
-CmdLine::CmdLine(QWidget *parent) : QWidget(parent) {
+CmdLine::CmdLine(App &app, CommandService &command_srv,
+                 ShortcutService &shortcut_srv, CompleteService &complete_srv)
+    : QWidget(nullptr), _app(app) {
   this->ui_init();
   this->event_init();
-  this->commands_init();
-  this->key_map_init();
+  this->commands_init(command_srv);
+  this->keymap_init(shortcut_srv);
+
+  complete_srv.set_interactive_backend(CmdLineInteractiveBackend::make(*this));
 }
 
 CmdLine::~CmdLine() {}
@@ -73,8 +104,7 @@ void CmdLine::ui_init() {
   this->setLayout(layout);
 }
 
-void CmdLine::commands_init() {
-  auto &srv = App::get().command_srv();
+void CmdLine::commands_init(CommandService &srv) {
   srv.add(Commands::kBeginningOfLine,
           std::bind(&QLineEdit::home, this->_line_edit,
                     std::cref(this->_text_mark)))
@@ -82,34 +112,16 @@ void CmdLine::commands_init() {
                                            std::cref(this->_text_mark)))
       .add(Commands::kBackspace,
            std::bind(&QLineEdit::backspace, this->_line_edit))
-      .add(Commands::kEnter,
-           [this]() {
-             auto list = this->_list_view->selectedItems();
-             if (!list.empty()) {
-               list.at(0)
-                   ->data(Qt::UserRole)
-                   .value<CompleteItem::ptr_t>()
-                   ->exec();
-             }
-           })
       .add(Commands::kInsertChar,
            [this]() {
-             auto &ev = App::get().cur_key_ev();
+             auto &ev = this->_app.cur_key_ev();
              if (!ev) {
                return;
              }
              this->_line_edit->insert((*ev)->text());
            })
-      .add(Commands::kNextLine,
-           [this]() {
-             this->_list_view->setCurrentRow(this->_list_view->currentRow() +
-                                             1);
-           })
-      .add(Commands::kPreviousLine,
-           [this]() {
-             this->_list_view->setCurrentRow(this->_list_view->currentRow() -
-                                             1);
-           })
+      .add(Commands::kNextLine, std::bind(&CmdLine::next_line, this))
+      .add(Commands::kPreviousLine, std::bind(&CmdLine::previous_line, this))
       .add(Commands::kForwardChar,
            std::bind(&QLineEdit::cursorForward, this->_line_edit,
                      std::cref(this->_text_mark), 1))
@@ -126,12 +138,11 @@ void CmdLine::commands_init() {
            std::bind(&QLineEdit::del, this->_line_edit));
 }
 
-void CmdLine::key_map_init() {
-  auto keymap = KeyMap::make("cmdline")
+void CmdLine::keymap_init(ShortcutService &srv) {
+  auto keymap = srv.make_keymap("cmdline")
                     ->add("Ctrl+a", Commands::kBeginningOfLine)
                     ->add("Ctrl+e", Commands::kEndOfLine)
                     ->add(QKeySequence(Qt::Key_Backspace), Commands::kBackspace)
-                    ->add(QKeySequence(Qt::Key_Return), Commands::kEnter)
                     ->add("Ctrl+n", Commands::kNextLine)
                     ->add("Ctrl+p", Commands::kPreviousLine)
                     ->add("Ctrl+f", Commands::kForwardChar)
@@ -152,28 +163,18 @@ void CmdLine::key_map_init() {
     keymap->add(QKeySequence(Qt::SHIFT | key), Commands::kInsertChar);
   }
 
-  App::get().shortcut_srv().map(keymap);
-}
-
-void CmdLine::on_text_changed(QString const &text) {
-  this->_list_view->clear();
-
-  complete_list list;
-  App::get().complete_srv().disptach(text.toStdString(), list);
-
-  for (auto &complete_item : list) {
-    auto item =
-        new QListWidgetItem(complete_item->desc().c_str(), this->_list_view);
-    item->setData(Qt::UserRole, QVariant::fromValue(complete_item));
-    this->_list_view->addItem(item);
-  }
-
-  this->_list_view->setCurrentRow(0);
+  srv.map(keymap);
 }
 
 void CmdLine::event_init() {
-  connect(this->_line_edit, &QLineEdit::textChanged, this,
-          &CmdLine::on_text_changed);
+  QObject::connect(
+      this->_line_edit, &QLineEdit::textChanged, [this](QString const &text) {
+        this->_text_changed.get_subscriber().on_next(text.toStdString());
+      });
+  QObject::connect(this->_list_view, &QListWidget::currentRowChanged,
+                   [this](int cur_row) {
+                     this->_item_selected.get_subscriber().on_next(cur_row);
+                   });
 }
 
 } // namespace my

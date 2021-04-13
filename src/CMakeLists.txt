@@ -8,6 +8,7 @@ find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets LinguistTools REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(Xapian REQUIRED)
+find_package(rxcpp PATHS /home/yydcnjjw/workspace/code/project/RxCpp/deploy REQUIRED)
 
 set(TS_FILES my-anything_zh_CN.ts)
 
@@ -35,8 +36,15 @@ else()
   qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
 
+target_include_directories(my-anything SYSTEM
+  PUBLIC
+  /home/yydcnjjw/workspace/code/project/di/include
+  /home/yydcnjjw/workspace/code/project/di/extension/include
+  )
+
 target_link_libraries(my-anything PRIVATE
   Qt${QT_VERSION_MAJOR}::Widgets
   ${XAPIAN_LIBRARIES}
-  spdlog::spdlog)
+  spdlog::spdlog
+  rxcpp)
 

@@ -4,14 +4,15 @@
 
 namespace my {
 
-KeyBind::KeyBind(keymap_ptr_t const &keymap, QKeySequence const &keyseq,
-                 std::string const &cmd_name)
-    : KeyBind(keymap, keyseq, *App::get().command_srv().get_command(cmd_name)) {
+KeyMap::ptr_t KeyMap::add(std::string const &keyseq, std::string const &cmd) {
+  return this->add(KeyBind::make(this->shared_from_this(),
+                                 QKeySequence(keyseq.c_str()),
+                                 _srv._command_srv.get_command(cmd).value()));
 }
 
-KeyBind::KeyBind(keymap_ptr_t const &keymap, std::string const &keyseq_str,
-                 std::string const &cmd_name)
-    : KeyBind(keymap, QKeySequence(keyseq_str.c_str()),
-              *App::get().command_srv().get_command(cmd_name)) {}
+KeyMap::ptr_t KeyMap::add(QKeySequence const &keyseq, std::string const &cmd) {
+  return this->add(KeyBind::make(this->shared_from_this(), keyseq,
+                                 _srv._command_srv.get_command(cmd).value()));
+}
 
 } // namespace my

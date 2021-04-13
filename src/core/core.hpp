@@ -1,9 +1,5 @@
 #pragma once
-#include <set>
-#include <map>
-#include <boost/format.hpp>
 
-#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
-#include <spdlog/spdlog.h>
-
+#include <core/types.hpp>
+#include <core/ob_value.hpp>
 #include <core/class_type.hpp>
