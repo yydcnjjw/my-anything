@@ -13,9 +13,8 @@ class CmdLine : public QWidget {
   Q_OBJECT
 
 public:
-  UNIQUE_CLS(CmdLine)
-  CmdLine(App &app, CommandService &command_srv, ShortcutService &shortcut_srv,
-          CompleteService &complete_srv);
+  CmdLine(App &app, CommandService &command_srv,
+          ShortcutService &shortcut_srv, CompleteService &complete_srv);
   ~CmdLine();
 
   void next_line() {
@@ -60,7 +59,6 @@ public:
     for (auto &complete_item : candidates) {
       auto item =
           new QListWidgetItem(complete_item->desc().c_str(), this->_list_view);
-      item->setData(Qt::UserRole, QVariant::fromValue(complete_item));
       this->_list_view->addItem(item);
     }
   }

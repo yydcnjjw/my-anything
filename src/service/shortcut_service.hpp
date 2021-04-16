@@ -16,7 +16,11 @@ public:
           Command::ptr_t const &cmd)
       : _keymap(keymap), _keyseq(keyseq), _cmd(cmd) {}
 
-  ~KeyBind() { this->cmd()->remove_keybind(this); }
+  ~KeyBind() {
+    if (this->_cmd) {
+      this->cmd()->remove_keybind(this);
+    }
+  }
 
   QKeySequence const &keyseq() const { return this->_keyseq; }
 
@@ -27,8 +31,8 @@ public:
   Command::ptr_t const &cmd() const { return this->_cmd; }
 
   template <typename... Args> void exec(Args &&...args) {
-    if (this->cmd()) {
-      this->cmd()->exec(std::forward<Args>(args)...);
+    if (this->_cmd) {
+      this->_cmd->exec(std::forward<Args>(args)...);
     }
   }
 
@@ -36,7 +40,7 @@ public:
 
   std::string str() const {
     return (boost::format("KeyBind{%s, %s}") %
-            _keyseq.toString().toStdString() % _cmd->name())
+            _keyseq.toString().toStdString() % (_cmd ? _cmd->name() : ""))
         .str();
   }
 
@@ -107,6 +111,16 @@ public:
   struct KeyBindCandidate {
     std::optional<KeyBind::ptr_t> exact_match;
     std::vector<KeyBind::ptr_t> partial_matches;
+    std::string str() const {
+      std::stringstream ss;
+      ss << "exact: " << (exact_match ? (*exact_match)->str() : "null");
+
+      for (auto kb : partial_matches) {
+        ss << kb->str() << std::endl;
+      }
+
+      return ss.str();
+    }
   };
 
   std::optional<KeyBind::ptr_t> exact_match(QKeySequence const &keyseq) const {
@@ -140,7 +154,7 @@ public:
     //        });
 
     KeyBindCandidate candidate;
-
+    
     for (auto &keymap : this->_keymaps | std::views::values) {
 
       for (auto &keybind : keymap->map() | std::views::values) {
@@ -211,8 +225,9 @@ public:
   }
 
   void map(KeyMap::ptr_t const &keymap) {
-    SPDLOG_DEBUG("map: {}", keymap->str());
-    this->_keymaps.emplace(keymap->name(), keymap);
+    if (!this->_keymaps.emplace(keymap->name(), keymap).second) {
+      SPDLOG_WARN("keymap: {} has been mapped", keymap->name());
+    }
   }
   void unmap(std::string const &name) { this->_keymaps.erase(name); }
 

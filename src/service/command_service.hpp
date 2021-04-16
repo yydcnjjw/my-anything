@@ -20,7 +20,6 @@ public:
   ~Command();
 
   template <typename... Args> auto exec(Args &&...args) {
-    SPDLOG_DEBUG("exec: {}", this->name());
     return _ex(std::forward<Args>(args)...);
   }
 
@@ -56,8 +55,6 @@ public:
   self_t &add(Command::ptr_t const &cmd) {
     if (!this->_commands.emplace(cmd->name(), cmd).second) {
       SPDLOG_WARN("Command {} has been registered", cmd->name());
-    } else {
-      SPDLOG_DEBUG("add Command {}", cmd->name());
     }
     return *this;
   }

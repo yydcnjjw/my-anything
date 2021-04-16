@@ -17,21 +17,19 @@ struct Args {
 
 class App : public QApplication {
 public:
-  App(CommandService &command_srv, ShortcutService &shortcut_srv,
+  App(Args args, CommandService &command_srv, ShortcutService &shortcut_srv,
       CompleteService &complete_srv);
+  ~App() {}
 
   static int run(argc_t argc, argv_t argv);
 
-  std::optional<QKeyEvent *> const &cur_key_ev() const {
-    return this->_cur_key_ev;
-  }
+  std::shared_ptr<QKeyEvent> cur_key_ev() { return this->_cur_key_ev; }
 
   bool notify(QObject *, QEvent *) override;
 
 private:
-  ShortcutService _shortcut_srv;
-  std::optional<QKeyEvent *> _cur_key_ev;
-  
+  ShortcutService &_shortcut_srv;
+  std::shared_ptr<QKeyEvent> _cur_key_ev;
 
   void commands_init(CommandService &command_srv,
                      CompleteService &complete_srv);

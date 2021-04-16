@@ -65,7 +65,10 @@ CmdLine::CmdLine(App &app, CommandService &command_srv,
   complete_srv.set_interactive_backend(CmdLineInteractiveBackend::make(*this));
 }
 
-CmdLine::~CmdLine() {}
+CmdLine::~CmdLine() {
+  this->_text_changed.get_subscriber().on_completed();
+  this->_item_selected.get_subscriber().on_completed();
+}
 
 void CmdLine::ui_init() {
   setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
@@ -114,11 +117,11 @@ void CmdLine::commands_init(CommandService &srv) {
            std::bind(&QLineEdit::backspace, this->_line_edit))
       .add(Commands::kInsertChar,
            [this]() {
-             auto &ev = this->_app.cur_key_ev();
+             auto ev = this->_app.cur_key_ev();
              if (!ev) {
                return;
              }
-             this->_line_edit->insert((*ev)->text());
+             this->_line_edit->insert(ev->text());
            })
       .add(Commands::kNextLine, std::bind(&CmdLine::next_line, this))
       .add(Commands::kPreviousLine, std::bind(&CmdLine::previous_line, this))
@@ -135,7 +138,11 @@ void CmdLine::commands_init(CommandService &srv) {
            std::bind(&QLineEdit::cursorWordBackward, this->_line_edit,
                      std::cref(this->_text_mark)))
       .add(Commands::kFrowardDelete,
-           std::bind(&QLineEdit::del, this->_line_edit));
+           std::bind(&QLineEdit::del, this->_line_edit))
+      .add(Commands::kEnter, [this]() {
+        this->_item_selected.get_subscriber().on_next(
+            this->_list_view->currentRow());
+      });
 }
 
 void CmdLine::keymap_init(ShortcutService &srv) {
@@ -149,7 +156,8 @@ void CmdLine::keymap_init(ShortcutService &srv) {
                     ->add("Ctrl+b", Commands::kBackwardChar)
                     ->add("Alt+f", Commands::kForwardWord)
                     ->add("Alt+b", Commands::kBackwardWord)
-                    ->add("Ctrl+d", Commands::kFrowardDelete);
+                    ->add("Ctrl+d", Commands::kFrowardDelete)
+                    ->add(QKeySequence(Qt::Key_Return), Commands::kEnter);
 
   for (int key{Qt::Key_Space}; key <= Qt::Key_QuoteLeft; ++key) {
     keymap->add(QKeySequence(key), Commands::kInsertChar);
@@ -171,10 +179,6 @@ void CmdLine::event_init() {
       this->_line_edit, &QLineEdit::textChanged, [this](QString const &text) {
         this->_text_changed.get_subscriber().on_next(text.toStdString());
       });
-  QObject::connect(this->_list_view, &QListWidget::currentRowChanged,
-                   [this](int cur_row) {
-                     this->_item_selected.get_subscriber().on_next(cur_row);
-                   });
 }
 
 } // namespace my

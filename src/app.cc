@@ -3,6 +3,7 @@
 #include <QKeyEvent>
 #include <boost/di.hpp>
 #include <boost/di/extension/policies/types_dumper.hpp>
+#include <boost/di/extension/scopes/shared.hpp>
 #include <service/complete_service.hpp>
 #include <ui/cmdline.hpp>
 
@@ -15,41 +16,40 @@ struct Commands {
 
 namespace di = boost::di;
 
-auto di_configuration(argc_t argc, argv_t argv) {
+auto service_configuration() {
   return di::make_injector<di::extension::types_dumper>(
-      // di::bind<Args>.to(Args{argc, argv}),
-      di::bind<App>.to<App>().in(di::singleton),
-      di::bind<CommandService>.to<CommandService>().in(di::singleton),
-      di::bind<CompleteService>.to<CompleteService>().in(di::singleton),
-      di::bind<ShortcutService>.to<ShortcutService>().in(di::singleton),
-      di::bind<CmdLine>.to<CmdLine>().in(di::singleton));
+      di::bind<CommandService>.to<CommandService>().in(di::extension::shared),
+      di::bind<CompleteService>.to<CompleteService>().in(di::extension::shared),
+      di::bind<ShortcutService>.to<ShortcutService>().in(
+          di::extension::shared));
+}
+
+auto app_configuration(argc_t argc, argv_t argv) {
+  return di::make_injector<di::extension::types_dumper>(
+      di::bind<Args>.to(Args{argc, argv}),
+      di::bind<App>.to<App>().in(di::extension::shared),
+      service_configuration(),
+      di::bind<CmdLine>.to<CmdLine>().in(di::extension::shared));
 };
 
-std::shared_ptr<Args> app_args;
 } // namespace
 
 namespace my {
 
 int App::run(argc_t argc, argv_t argv) {
-  app_args = std::make_shared<Args>(argc, argv);
-
   spdlog::set_level(spdlog::level::debug);
+  auto inject = app_configuration(argc, argv);
 
-  auto injector = di_configuration(argc, argv);
-  auto &app = injector.create<App &>();
+  auto &app = inject.create<App &>();
 
-  injector.create<CmdLine &>().show();
-
-  SPDLOG_DEBUG("app exec...");
+  inject.create<CmdLine &>().show();
 
   return app.exec();
 }
 
-App::App(CommandService &command_srv, ShortcutService &shortcut_srv,
+App::App(Args args, CommandService &command_srv, ShortcutService &shortcut_srv,
          CompleteService &complete_srv)
-    : QApplication(app_args->argc, app_args->argv),
-      _shortcut_srv(shortcut_srv) {
-
+    : QApplication(args.argc, args.argv), _shortcut_srv(shortcut_srv) {
   this->commands_init(command_srv, complete_srv);
   this->keymap_init(shortcut_srv);
 }
@@ -58,14 +58,14 @@ bool App::notify(QObject *o, QEvent *e) {
   switch (e->type()) {
   case QEvent::KeyPress: {
     auto key_ev = reinterpret_cast<QKeyEvent *>(e);
-    this->_cur_key_ev = key_ev;
+    this->_cur_key_ev.reset(key_ev->clone());
     if (this->_shortcut_srv.disptach(key_ev)) {
       return true;
     }
     break;
   }
   case QEvent::KeyRelease:
-    this->_cur_key_ev = std::nullopt;
+    this->_cur_key_ev.reset();
     break;
   default:
     break;

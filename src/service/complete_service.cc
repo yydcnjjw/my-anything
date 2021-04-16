@@ -153,7 +153,8 @@ void CompleteService::service_init(CommandService &command_srv,
 void CompleteService::set_interactive_backend(
     InteractiveBackend::ptr_t const &backend) {
 
-  auto text_changed_cs = backend->text_changed().subscribe(
+  this->_interactive_ctx.backend = backend;
+  this->_interactive_ctx.text_changed_cs = backend->text_changed().subscribe(
       [this, &backend](std::string const &input) {
         auto ctx = this->get_ctx_top();
 
@@ -169,21 +170,19 @@ void CompleteService::set_interactive_backend(
 
         this->_interactive_ctx.update_items(*ctx);
       });
+  this->_interactive_ctx.item_selected_cs =
+      backend->item_selected().subscribe([this](auto i) {
+        auto ctx = this->get_ctx_top();
+        if (!ctx) {
+          return;
+        }
 
-  auto item_selected_cs = backend->item_selected().subscribe([this](auto i) {
-    auto ctx = this->get_ctx_top();
-    if (!ctx) {
-      return;
-    }
+        (*ctx)->select(i);
 
-    (*ctx)->select(i);
+        this->_ctxs.pop();
 
-    this->_ctxs.pop();
-
-    this->update_items();
-  });
-
-  this->_interactive_ctx = {backend, text_changed_cs, item_selected_cs};
+        this->update_items();
+      });
 }
 
 } // namespace my
