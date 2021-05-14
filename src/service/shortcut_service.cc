@@ -1,4 +1,4 @@
-#include <service/shortcut_service.hpp>
+#include "shortcut_service.hpp"
 
 #include <app.hpp>
 

@@ -1,9 +1,11 @@
-#include <app.hpp>
+#include "app.hpp"
 
 #include <QKeyEvent>
 #include <boost/di.hpp>
 #include <boost/di/extension/policies/types_dumper.hpp>
 #include <boost/di/extension/scopes/shared.hpp>
+#include <document/document.hpp>
+#include <document/org/org.hpp>
 #include <service/complete_service.hpp>
 #include <ui/cmdline.hpp>
 
@@ -15,6 +17,14 @@ struct Commands {
 };
 
 namespace di = boost::di;
+
+auto document_configuration() {
+  return di::make_injector<di::extension::types_dumper>(
+      di::bind<NNetLanguageIdentifier>.to<>(
+          std::make_shared<NNetLanguageIdentifier>(0, 4096)),
+      di::bind<DocumentBuilder>().to<DocumentBuilder>().in(
+          di::extension::shared));
+}
 
 auto service_configuration() {
   return di::make_injector<di::extension::types_dumper>(
@@ -28,7 +38,7 @@ auto app_configuration(argc_t argc, argv_t argv) {
   return di::make_injector<di::extension::types_dumper>(
       di::bind<Args>.to(Args{argc, argv}),
       di::bind<App>.to<App>().in(di::extension::shared),
-      service_configuration(),
+      service_configuration(), document_configuration(),
       di::bind<CmdLine>.to<CmdLine>().in(di::extension::shared));
 };
 
@@ -40,11 +50,12 @@ int App::run(argc_t argc, argv_t argv) {
   spdlog::set_level(spdlog::level::debug);
   auto inject = app_configuration(argc, argv);
 
-  auto &app = inject.create<App &>();
+  return 0;
+  // auto &app = inject.create<App &>();
 
-  inject.create<CmdLine &>().show();
+  // inject.create<CmdLine &>().show();
 
-  return app.exec();
+  // return app.exec();
 }
 
 App::App(Args args, CommandService &command_srv, ShortcutService &shortcut_srv,

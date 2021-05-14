@@ -1,0 +1,12 @@
+[submodule "vendor/cld3"]
+	path = vendor/cld3
+	url = https://github.com/google/cld3.git
+[submodule "vendor/di"]
+	path = vendor/di
+	url = https://github.com/boost-ext/di
+[submodule "vendor/RxCpp"]
+	path = vendor/RxCpp
+	url = https://github.com/ReactiveX/RxCpp.git
+[submodule "vendor/mecab"]
+	path = vendor/mecab
+	url = https://github.com/taku910/mecab.git

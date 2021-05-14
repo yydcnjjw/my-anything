@@ -1,3 +1,5 @@
+add_subdirectory(document)
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOUIC ON)
@@ -10,43 +12,52 @@ find_package(QT NAMES Qt6
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(Xapian REQUIRED)
-find_package(rxcpp PATHS /home/yydcnjjw/workspace/code/project/RxCpp/deploy REQUIRED)
-
-set(TS_FILES my-anything_zh_CN.ts)
+find_package(Protobuf REQUIRED)
 
 set(PROJECT_SOURCES
-  main.cc
   app.cc
   ui/cmdline.cc
   service/command_service.cc
   service/shortcut_service.cc
   service/complete_service.cc
-  ${TS_FILES}
   )
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-  qt_add_executable(my-anything
-    ${PROJECT_SOURCES}
-    )
 
-  qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
-else()
-  add_executable(my-anything
-    ${PROJECT_SOURCES}
-    )
-
-  qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
-endif()
-
-target_include_directories(my-anything SYSTEM
-  PUBLIC
-  /home/yydcnjjw/workspace/code/project/di/include
-  /home/yydcnjjw/workspace/code/project/di/extension/include
+add_library(my_anything_lib
+  ${PROJECT_SOURCES}
   )
 
-target_link_libraries(my-anything PRIVATE
+set(MY_ANYTHING_INC
+  ${VENDOR_SOURCE_DIR}/di/include
+  ${VENDOR_SOURCE_DIR}/di/extension/include
+  ${VENDOR_SOURCE_DIR}/cld3/src
+  ${VENDOR_BINARY_DIR}/cld3
+  ${VENDOR_SOURCE_DIR}/RxCpp/Rx/v2/src/rxcpp
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  )
+
+set(MY_ANYTHING_LIB
   Qt${QT_VERSION_MAJOR}::Widgets
   ${XAPIAN_LIBRARIES}
   spdlog::spdlog
-  rxcpp)
+  cld3
+  ${Protobuf_LITE_LIBRARIES}
+  org_parser
+  )
 
+target_include_directories(my_anything_lib SYSTEM
+  PUBLIC
+  ${MY_ANYTHING_INC}
+  )
+
+target_link_libraries(my_anything_lib
+  PUBLIC
+  ${MY_ANYTHING_LIB})
+
+
+add_executable(my_anything
+  main.cc
+  )
+
+target_link_libraries(my_anything PRIVATE
+  my_anything_lib)
