@@ -36,14 +36,14 @@ auto parse(std::string const &s, Parser const &parser) {
 }
 
 template <typename Parser>
-auto parse(std::istream const &is, Parser const &parser) {
+auto parse(std::istream &is, Parser const &parser) {
   stream_iterator_type begin{
       boost::spirit::make_default_multi_pass(streambuf_iterator_type{is})},
       end{};
   return detail::parse(begin, end, parser);
 }
 
-template <typename T> auto parse_document(T const &t) {
+template <typename T> auto parse_document(T &t) {
   return parse(t, org::document());
 }
 

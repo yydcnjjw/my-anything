@@ -4,6 +4,7 @@
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
 #include <boost/spirit/home/x3/support/context.hpp>
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
+#include <iostream>
 
 namespace boost {
 namespace spirit {

@@ -1,6 +1,8 @@
 #pragma once
 
+#include <org/parser/grammar/greater_block.hpp>
 #include <org/parser/grammar/headline.hpp>
+#include <org/parser/grammar/paragraph.hpp>
 #include <org/parser/grammar/section.hpp>
 
 namespace my {
@@ -14,19 +16,18 @@ using x3::eol;
 
 namespace section {
 
+x3::rule<struct SectionElementClz, ast::SectionNodeElement> const
+    section_element{"section_element"};
+auto const section_element_def = org::greater_block() | org::paragraph();
+
+BOOST_SPIRIT_DEFINE(section_element);
+
 section_t const section{"section"};
-
-auto const line{*(char_ - eol) > eol};
-
-auto section_action = [](auto &ctx) {
-  x3::_val(ctx).content += x3::_attr(ctx) + '\n';
-};
-auto const section_def{+(line // - headline()
-                         - eoi)[section_action]};
-
-BOOST_SPIRIT_DEFINE(section);
+auto const section_def{+(section_element - org::headline())};
 
 } // namespace section
+
+BOOST_SPIRIT_DEFINE(section::section);
 
 struct SectionClz : x3::annotate_on_success, error_handler_base {};
 

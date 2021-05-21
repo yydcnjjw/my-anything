@@ -14,6 +14,18 @@ struct GreaterBlock : GreaterElementData {
   std::string content;
 };
 
+inline std::ostream &operator<<(std::ostream &os, GreaterBlock const &v) {
+  os << "GreaterBlock{\n";
+  os << v.name << std::endl;
+  for (auto &p : v.parameters) {
+    os << p << ' ';
+  }
+  os << std::endl;
+  os << v.content;
+  os << "}\n";
+  return os;
+}
+
 } // namespace ast
 } // namespace org
 } // namespace my
