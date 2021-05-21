@@ -4,6 +4,7 @@
 #include <boost/fusion/include/adapt_adt.hpp>
 
 #include <regex>
+#include <ranges>
 
 #include <org/parser/ast/data_type.hpp>
 #include <org/parser/ast/section.hpp>
@@ -52,17 +53,17 @@ private:
   std::vector<std::string> _tags;
 
   std::smatch::difference_type extract_tags(std::string const &s) {
-    static std::regex const r("[ \t]+(:[[:alnum:]_@#%:]+:)[ \t]*$");
+    std::regex const r("[ \t]+(:[[:alnum:]_@#%:]+:)[ \t]*$");
     std::smatch m;
     if (std::regex_search(s, m, r)) {
       this->_tags.clear();
       std::ranges::for_each(std::ranges::subrange(m[1].first + 1, m[1].second) |
                                 std::views::split(':'),
                             [this](auto const &tag) {
-                              std::string s{std::string_view(
-                                  &*tag.begin(), std::ranges::distance(tag))};
-                              if (!s.empty()) {
-                                this->_tags.push_back(std::move(s));
+                              auto view = std::string_view(
+                                  &*tag.begin(), std::ranges::distance(tag));
+                              if (!view.empty()) {
+                                this->_tags.push_back(std::string(view));
                               }
                             });
     }
@@ -83,7 +84,7 @@ inline std::ostream &operator<<(std::ostream &os, Headline const &v) {
   }
   os << " " << v.title();
 
-  os << " ";
+  os << " tags: ";
   auto &t = v.tags();
   std::copy(t.begin(), t.end(), std::ostream_iterator<std::string>(os, ":"));
 

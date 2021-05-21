@@ -11,4 +11,5 @@ add_executable(my_anything_test
 target_link_libraries(my_anything_test
   GTest::gtest
   GTest::gtest_main
-  my_anything_lib)
+  # my_anything_lib
+  )

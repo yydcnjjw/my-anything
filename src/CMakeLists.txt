@@ -22,41 +22,41 @@ set(PROJECT_SOURCES
   )
 
 
-add_library(my_anything_lib
-  ${PROJECT_SOURCES}
-  )
+# add_library(my_anything_lib
+#   ${PROJECT_SOURCES}
+#   )
 
-set(MY_ANYTHING_INC
-  ${VENDOR_SOURCE_DIR}/di/include
-  ${VENDOR_SOURCE_DIR}/di/extension/include
-  ${VENDOR_SOURCE_DIR}/cld3/src
-  ${VENDOR_BINARY_DIR}/cld3
-  ${VENDOR_SOURCE_DIR}/RxCpp/Rx/v2/src/rxcpp
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  )
+# set(MY_ANYTHING_INC
+#   ${VENDOR_SOURCE_DIR}/di/include
+#   ${VENDOR_SOURCE_DIR}/di/extension/include
+#   ${VENDOR_SOURCE_DIR}/cld3/src
+#   ${VENDOR_BINARY_DIR}/cld3
+#   ${VENDOR_SOURCE_DIR}/RxCpp/Rx/v2/src/rxcpp
+#   ${CMAKE_CURRENT_SOURCE_DIR}
+#   )
 
-set(MY_ANYTHING_LIB
-  Qt${QT_VERSION_MAJOR}::Widgets
-  ${XAPIAN_LIBRARIES}
-  spdlog::spdlog
-  cld3
-  ${Protobuf_LITE_LIBRARIES}
-  org_parser
-  )
+# set(MY_ANYTHING_LIB
+#   Qt${QT_VERSION_MAJOR}::Widgets
+#   ${XAPIAN_LIBRARIES}
+#   spdlog::spdlog
+#   cld3
+#   ${Protobuf_LITE_LIBRARIES}
+#   org_parser
+#   )
 
-target_include_directories(my_anything_lib SYSTEM
-  PUBLIC
-  ${MY_ANYTHING_INC}
-  )
+# target_include_directories(my_anything_lib SYSTEM
+#   PUBLIC
+#   ${MY_ANYTHING_INC}
+#   )
 
-target_link_libraries(my_anything_lib
-  PUBLIC
-  ${MY_ANYTHING_LIB})
+# target_link_libraries(my_anything_lib
+#   PUBLIC
+#   ${MY_ANYTHING_LIB})
 
 
-add_executable(my_anything
-  main.cc
-  )
+# add_executable(my_anything
+#   main.cc
+#   )
 
-target_link_libraries(my_anything PRIVATE
-  my_anything_lib)
+# target_link_libraries(my_anything PRIVATE
+#   my_anything_lib)

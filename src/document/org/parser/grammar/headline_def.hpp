@@ -27,16 +27,19 @@ auto const keyword_def{+char_("A-Z") > omit[+blank]};
 struct PriorityClz : x3::annotate_on_success, error_handler_base {};
 x3::rule<PriorityClz, char> const priority{"priority"};
 auto const priority_def{lexeme["[#" > char_("a-zA-Z") > ']'] > omit[*blank]};
-
+  
+struct TagsClz : x3::annotate_on_success, error_handler_base {};
+x3::rule<TagsClz, std::vector<std::string>> const tags{"tags"};
+auto const tags_def{':' > *(char_ - char_(" :")) % ':'};
+  
 struct TitleClz : x3::annotate_on_success, error_handler_base {};
 x3::rule<TitleClz, std::string> const title{"title"};
-auto const title_def{(*(char_ - eol))};
+auto const title_def{(+(char_ - eol)) - tags};
 
-BOOST_SPIRIT_DEFINE(headline::starts, headline::keyword, headline::priority,
-                    headline::title);
+BOOST_SPIRIT_DEFINE(starts, keyword, priority, title, tags);
 
 headline_t const headline{"headline"};
-auto const headline_def{starts > -keyword > -priority > title > eol};
+auto const headline_def{starts > -keyword > -priority > -title > eol};
 
 } // namespace headline
 
