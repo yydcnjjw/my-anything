@@ -53,7 +53,7 @@ private:
   std::vector<std::string> _tags;
 
   std::smatch::difference_type extract_tags(std::string const &s) {
-    std::regex const r("[ \t]+(:[[:alnum:]_@#%:]+:)[ \t]*$");
+    static std::regex const r("[ \t]+(:[[:alnum:]_@#%:]+:)[ \t]*$");
     std::smatch m;
     if (std::regex_search(s, m, r)) {
       this->_tags.clear();
