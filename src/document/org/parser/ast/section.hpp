@@ -9,13 +9,23 @@ namespace my {
 namespace org {
 namespace ast {
 
-struct SectionNodeElement : x3::variant<GreaterBlock, Paragraph> {
-  using base_type::base_type;
-  using base_type::operator=;
-};
-
 struct Section : GreaterElementData {
-  std::list<SectionNodeElement> elements;
+  struct SubElement : x3::variant<GreaterBlock, Paragraph> {
+    using base_type::base_type;
+    using base_type::operator=;
+  };
+
+  Section() {
+  }
+
+  Section(std::list<SubElement> &&v) : elements{std::move(v)} {}
+
+  Section& operator=(std::list<SubElement> &&v) {
+    this->elements = std::move(v);
+    return *this;
+  }
+
+  std::list<SubElement> elements;
 };
 
 inline std::ostream &operator<<(std::ostream &os, Section const &v) {

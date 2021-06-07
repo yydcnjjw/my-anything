@@ -1,10 +1,11 @@
 #include <org/parser/config.hpp>
 #include <org/parser/grammar/common_def.hpp>
-#include <org/parser/grammar/document_def.hpp>
 #include <org/parser/grammar/greater_block_def.hpp>
 #include <org/parser/grammar/paragraph_def.hpp>
 #include <org/parser/grammar/headline_def.hpp>
 #include <org/parser/grammar/section_def.hpp>
+#include <org/parser/grammar/content_def.hpp>
+#include <org/parser/grammar/document_def.hpp>
 #include <org/parser/parser.hpp>
 
 namespace my {

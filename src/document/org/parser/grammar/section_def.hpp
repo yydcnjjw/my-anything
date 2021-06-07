@@ -16,14 +16,14 @@ using x3::eol;
 
 namespace section {
 
-x3::rule<struct SectionElementClz, ast::SectionNodeElement> const
-    section_element{"section_element"};
-auto const section_element_def = org::greater_block() | org::paragraph();
+x3::rule<struct SectionSubElementClz, ast::Section::SubElement> const
+    section_sub_element{"section_sub_element"};
+auto const section_sub_element_def = org::greater_block() | org::paragraph();
 
-BOOST_SPIRIT_DEFINE(section_element);
+BOOST_SPIRIT_DEFINE(section_sub_element);
 
 section_t const section{"section"};
-auto const section_def{+(section_element - org::headline())};
+auto const section_def{+(section_sub_element - org::headline())};
 
 } // namespace section
 

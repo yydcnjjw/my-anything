@@ -8,7 +8,7 @@ namespace org {
 namespace grammar {
 
 struct DocumentClz;
-using document_t = x3::rule<DocumentClz, ast::RootElement>;
+using document_t = x3::rule<DocumentClz, ast::Document>;
 
 BOOST_SPIRIT_DECLARE(document_t);
 

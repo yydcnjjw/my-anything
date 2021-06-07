@@ -1,25 +1,14 @@
 #pragma once
 
-#include <boost/fusion/adapted/adt/adapt_adt.hpp>
-#include <boost/fusion/include/adapt_adt.hpp>
-
 #include <regex>
 #include <ranges>
 
-#include <org/parser/ast/data_type.hpp>
-#include <org/parser/ast/section.hpp>
+#include <org/parser/ast/content.hpp>
 
 namespace my {
 namespace org {
 
 namespace ast {
-
-class Headline;
-
-struct Content {
-  std::optional<Section *> section;
-  std::list<Headline *> headlines;
-};
 
 class Headline : public GreaterElementData {
 public:
@@ -43,7 +32,9 @@ public:
 
   void tags(std::vector<std::string> const &tags) { this->_tags = tags; }
 
-  Content content;
+  Content const &content() const { return this->_content; }
+
+  void content(Content const &v) { this->_content = v; }
 
 private:
   std::string _stars;
@@ -51,6 +42,7 @@ private:
   std::optional<char> _priority;
   std::string _title;
   std::vector<std::string> _tags;
+  Content _content;
 
   std::smatch::difference_type extract_tags(std::string const &s) {
     static std::regex const r("[ \t]+(:[[:alnum:]_@#%:]+:)[ \t]*$");
@@ -71,8 +63,6 @@ private:
   }
 };
 
-inline std::ostream &operator<<(std::ostream &os, Content const &v);
-
 inline std::ostream &operator<<(std::ostream &os, Headline const &v) {
   os << "Headline{\n";
   os << v.stars();
@@ -89,19 +79,8 @@ inline std::ostream &operator<<(std::ostream &os, Headline const &v) {
   std::copy(t.begin(), t.end(), std::ostream_iterator<std::string>(os, ":"));
 
   os << std::endl;
-  os << v.content;
+  os << v.content();
   os << "}\n";
-  return os;
-}
-
-std::ostream &operator<<(std::ostream &os, Content const &v) {
-  if (v.section) {
-    os << **v.section;
-  }
-
-  for (auto &headline : v.headlines) {
-    os << *headline;
-  }
   return os;
 }
 
@@ -114,5 +93,7 @@ BOOST_FUSION_ADAPT_ADT(my::org::ast::Headline,
                        (obj.stars(), obj.stars(val))
                        (obj.keyword(), obj.keyword(val))
                        (obj.priority(), obj.priority(val))
-                       (obj.title(), obj.title(val)))
+                       (obj.title(), obj.title(val))
+                       (obj.content(), obj.content(val))
+                       )
 // clang-format off

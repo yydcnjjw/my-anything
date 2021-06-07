@@ -1,6 +1,7 @@
 #pragma once
 
 #include <org/parser/grammar/headline.hpp>
+#include <org/parser/grammar/content.hpp>
 
 namespace my {
 namespace org {
@@ -39,7 +40,7 @@ auto const title_def{(+(char_ - eol)) - tags};
 BOOST_SPIRIT_DEFINE(starts, keyword, priority, title, tags);
 
 headline_t const headline{"headline"};
-auto const headline_def{starts > -keyword > -priority > -title > eol};
+auto const headline_def{starts > -keyword > -priority > -title > eol > org::content()};
 
 } // namespace headline
 
