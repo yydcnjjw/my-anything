@@ -14,7 +14,9 @@ BOOST_SPIRIT_DECLARE(document_t);
 
 struct document_ctx_tag;
 template<typename Iterator>
-struct DocumentCtx {};
+struct DocumentCtx {
+  std::size_t last_level{0};
+};
 
 template <typename Iterator>
 using document_context_type =

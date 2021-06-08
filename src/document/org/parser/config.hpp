@@ -18,10 +18,9 @@ using phrase_context_type =
     x3::phrase_parse_context<x3::ascii::blank_type>::type;
 
 template <typename Iterator>
-using context_t =
-    x3::context<error_handler_tag,
-                std::reference_wrapper<error_handler<Iterator>>
-                >;
+using context_t = x3::context<error_handler_tag,
+                              std::reference_wrapper<error_handler<Iterator>>,
+                              grammar::document_context_type<Iterator>>;
 } // namespace org
 
 } // namespace my

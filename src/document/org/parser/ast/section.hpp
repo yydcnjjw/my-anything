@@ -29,11 +29,11 @@ struct Section : GreaterElementData {
 };
 
 inline std::ostream &operator<<(std::ostream &os, Section const &v) {
-  os << "Section{\n";
+  os << " " << "Section{\n";
   for (auto &e : v.elements) {
     boost::apply_visitor([&](auto &v) { os << v; }, e);
   }
-  os << "}\n";
+  os << " " << "}\n";
   return os;
 }
 

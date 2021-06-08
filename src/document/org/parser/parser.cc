@@ -1,3 +1,7 @@
+// #define BOOST_SPIRIT_X3_DEBUG
+#define BOOST_SPIRIT_X3_UNICODE
+#define BOOST_SPIRIT_X3_DEBUG_OUT std::cout
+
 #include <org/parser/config.hpp>
 #include <org/parser/grammar/common_def.hpp>
 #include <org/parser/grammar/greater_block_def.hpp>

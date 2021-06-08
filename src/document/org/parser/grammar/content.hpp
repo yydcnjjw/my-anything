@@ -8,7 +8,7 @@ namespace org {
 namespace grammar {
 
 struct ContentClz;
-using content_t = x3::rule<ContentClz, ast::Content>;
+using content_t = x3::rule<ContentClz, ast::Content, true>;
 
 BOOST_SPIRIT_DECLARE(content_t);
 

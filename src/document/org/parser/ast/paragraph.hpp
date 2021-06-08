@@ -14,9 +14,11 @@ struct Paragraph : ElementData {
 };
 
 inline std::ostream &operator<<(std::ostream &os, Paragraph const &v) {
-  os << "Paragraph{\n";
-  os << v.content;
-  os << "}\n";
+  os << " "
+     << "Paragraph{\n";
+  os << " " << v.content;
+  os << " "
+     << "}\n";
   return os;
 }
 

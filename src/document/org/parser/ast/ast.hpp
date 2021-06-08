@@ -15,6 +15,13 @@ struct Document : Content {
 };
 
 using boost::fusion::operator<<;
+
+inline std::ostream &operator<<(std::ostream &os, Document const &v) {
+  os << "Document{\n";
+  os << reinterpret_cast<Content const&>(v);
+  os << "}\n";
+  return os;
+}
   
 } // namespace ast
   

@@ -15,32 +15,33 @@ using x3::char_;
 using x3::eol;
 using x3::lexeme;
 using x3::omit;
-
+using x3::raw;
+  
 namespace headline {
-struct StartsClz : x3::annotate_on_success, error_handler_base {};
-x3::rule<StartsClz, std::string> const starts{"starts"};
-auto const starts_def = +char_('*') > omit[+blank];
+struct StarsClz : x3::annotate_on_success, error_handler_base {};
+auto const stars = x3::rule<StarsClz, std::string>{"stars"} =
+    +char_('*') > omit[+blank];
 
 struct KeywordClz : x3::annotate_on_success, error_handler_base {};
-x3::rule<struct KeywordClz, std::string> const keyword{"keyword"};
-auto const keyword_def{+char_("A-Z") > omit[+blank]};
+auto const keyword = x3::rule<struct KeywordClz, std::string>{"keyword"} =
+    +char_("A-Z") > omit[+blank];
 
 struct PriorityClz : x3::annotate_on_success, error_handler_base {};
-x3::rule<PriorityClz, char> const priority{"priority"};
-auto const priority_def{lexeme["[#" > char_("a-zA-Z") > ']'] > omit[*blank]};
-  
-struct TagsClz : x3::annotate_on_success, error_handler_base {};
-x3::rule<TagsClz, std::vector<std::string>> const tags{"tags"};
-auto const tags_def{':' > *(char_ - char_(" :")) % ':'};
-  
-struct TitleClz : x3::annotate_on_success, error_handler_base {};
-x3::rule<TitleClz, std::string> const title{"title"};
-auto const title_def{(+(char_ - eol)) - tags};
+auto const priority = x3::rule<PriorityClz, char>{"priority"} =
+    lexeme["[#" > char_("a-zA-Z") > ']'] > omit[*blank];
 
-BOOST_SPIRIT_DEFINE(starts, keyword, priority, title, tags);
+struct TagsClz : x3::annotate_on_success, error_handler_base {};
+auto const tags = x3::rule<TagsClz, std::vector<std::string>>{
+    "tags"} = ':' > *(char_ - char_(" :")) % ':';
+
+struct TitleClz : x3::annotate_on_success, error_handler_base {};
+auto const title = x3::rule<TitleClz, std::string>{"title"} =
+    (+(char_ - eol)) - tags;
 
 headline_t const headline{"headline"};
-auto const headline_def{starts > -keyword > -priority > -title > eol > org::content()};
+
+auto const headline_def{stars > -keyword > -priority > -title > eol >
+                        org::content()};
 
 } // namespace headline
 

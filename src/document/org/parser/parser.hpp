@@ -19,9 +19,11 @@ parse(Iterator &begin, Iterator end, Parser const &parser) {
   error_handler<Iterator> err_handler(begin, end, std::cerr);
   grammar::DocumentCtx<Iterator> ctx;
 
-  if (x3::parse(begin, end,
-                x3::with<error_handler_tag>(std::ref(err_handler))[parser],
-                v)) {
+  if (x3::parse(
+          begin, end,
+          x3::with<grammar::document_ctx_tag>(std::ref(
+              ctx))[x3::with<error_handler_tag>(std::ref(err_handler))[parser]],
+          v)) {
     return v;
   } else {
     return std::nullopt;

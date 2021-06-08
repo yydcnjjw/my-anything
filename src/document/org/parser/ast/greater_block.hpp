@@ -15,14 +15,16 @@ struct GreaterBlock : GreaterElementData {
 };
 
 inline std::ostream &operator<<(std::ostream &os, GreaterBlock const &v) {
-  os << "GreaterBlock{\n";
-  os << v.name << std::endl;
+  os << " "
+     << "GreaterBlock{\n";
+  os << " " << v.name << std::endl;
   for (auto &p : v.parameters) {
-    os << p << ' ';
+    os << " " << p << ' ';
   }
-  os << std::endl;
-  os << v.content;
-  os << "}\n";
+  os << " " << std::endl;
+  os << " " << v.content;
+  os << " "
+     << "}\n";
   return os;
 }
 

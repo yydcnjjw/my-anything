@@ -7,7 +7,7 @@ namespace my {
 namespace org {
 namespace ast {
 
-std::ostream &operator<<(std::ostream &os, Content const &v) {
+inline std::ostream &operator<<(std::ostream &os, Content const &v) {
   if (v.section) {
     os << v.section.value();
   }

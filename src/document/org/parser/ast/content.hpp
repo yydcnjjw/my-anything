@@ -15,11 +15,11 @@ namespace ast {
 struct Headline;
 
 struct Content : x3::position_tagged {
-  std::optional<Section> section;
+  boost::optional<Section> section;
   std::list<Headline> headlines;
 };
 
-inline std::ostream &operator<<(std::ostream &os, Content const &v);
+std::ostream &operator<<(std::ostream &os, Content const &v);
   
 } // namespace ast
 } // namespace org
