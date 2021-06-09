@@ -1,24 +1,28 @@
 #pragma once
 
-#include <org/parser/ast/content.hpp>
+#include <org/parser/ast/types.hpp>
+#include <org/parser/ast/section.hpp>
+#include <org/parser/ast/headline.hpp>
 
 namespace my {
 
 namespace org {
 namespace ast {
 
-struct Document : Content {
-  Document &operator=(Content &&v) {
-    Content::operator=(std::move(v));
-    return *this;
-  }
+struct Document {
+  optional<Section> section;
+  std::list<Headline> headlines;
 };
-
-using boost::fusion::operator<<;
 
 inline std::ostream &operator<<(std::ostream &os, Document const &v) {
   os << "Document{\n";
-  os << reinterpret_cast<Content const&>(v);
+  if (v.section) {
+    os << v.section.value();
+  }
+
+  for (auto &headline : v.headlines) {
+    os << headline;
+  }
   os << "}\n";
   return os;
 }
@@ -28,3 +32,5 @@ inline std::ostream &operator<<(std::ostream &os, Document const &v) {
 } // namespace org
 
 } // namespace my
+
+BOOST_FUSION_ADAPT_STRUCT(my::org::ast::Document, section, headlines)

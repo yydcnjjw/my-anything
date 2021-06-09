@@ -9,7 +9,7 @@ namespace org {
 namespace grammar {
 
 struct HeadlineClz;
-using headline_t = x3::rule<HeadlineClz, ast::Headline>;
+using headline_t = x3::rule<HeadlineClz, ast::Headline, true>;
 
 BOOST_SPIRIT_DECLARE(headline_t);
 

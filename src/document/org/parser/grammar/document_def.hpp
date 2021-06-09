@@ -1,7 +1,8 @@
 #pragma once
 
 #include <org/parser/grammar/document.hpp>
-#include <org/parser/grammar/content.hpp>
+#include <org/parser/grammar/headline.hpp>
+#include <org/parser/grammar/section.hpp>
 
 namespace my {
 namespace org {
@@ -11,9 +12,14 @@ namespace grammar {
 using x3::eoi;
 using x3::eps;
 
-document_t const document{"document"};
+auto document_op = [](auto &ctx) {
+  auto &headline = x3::_attr(ctx);
+  std::cout << "doc: " << headline.title << std::endl;
+};
 
-auto const document_def = eps > org::content() > eoi;
+document_t const document{"document"};
+auto const document_def = eps > -org::section() >
+                          *(org::headline() / document_op) > eoi;
 
 BOOST_SPIRIT_DEFINE(document);
 

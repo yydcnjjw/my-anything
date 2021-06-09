@@ -1,12 +1,40 @@
 #pragma once
 
+#include <boost/regex/icu.hpp>
+#include <ranges>
+
+#include <boost/mpl/not.hpp>
+
 #include <org/parser/grammar/headline.hpp>
-#include <org/parser/grammar/content.hpp>
+#include <org/parser/grammar/section.hpp>
 
 namespace my {
 namespace org {
 
 namespace grammar {
+
+inline auto extract_tags(std::string const &s) {
+  static auto const r = boost::make_u32regex("[ \t]+(:[[:alnum:]_@#%:]+:)[ \t]*$");
+  std::vector<std::string> tags;
+  boost::smatch m;
+  boost::smatch::difference_type pos{0};
+  if (boost::u32regex_search(s, m, r)) {
+    std::ranges::for_each(std::ranges::subrange(m[1].first + 1, m[1].second) |
+                              std::views::split(':'),
+                          [&tags](auto const &tag) {
+                            auto view = std::string_view(
+                                &*tag.begin(), std::ranges::distance(tag));
+                            if (!view.empty()) {
+                              tags.push_back(std::string(view));
+                            }
+                          });
+    pos = m.position();
+  } else {
+    pos = s.size();
+  }
+
+  return std::make_pair(tags, pos);
+}
 
 namespace ascii = x3::ascii;
 
@@ -18,9 +46,22 @@ using x3::omit;
 using x3::raw;
   
 namespace headline {
+auto stars_op = [](auto &ctx) {
+  auto curlevel = x3::_attr(ctx).size();
+  auto &doc_ctx = x3::get<document_ctx_tag>(ctx).get();
+  auto lastlevel = doc_ctx.levels.top();
+  if (curlevel > lastlevel) {
+    x3::_pass(ctx) = true;
+    doc_ctx.levels.push(curlevel);
+  } else {
+    x3::_pass(ctx) = false;
+    doc_ctx.levels.pop();
+  }
+};
+
 struct StarsClz : x3::annotate_on_success, error_handler_base {};
-auto const stars = x3::rule<StarsClz, std::string>{"stars"} =
-    +char_('*') > omit[+blank];
+auto const stars = x3::rule<StarsClz, std::string, true>{"stars"} =
+    (+char_('*') > omit[+blank])[stars_op];
 
 struct KeywordClz : x3::annotate_on_success, error_handler_base {};
 auto const keyword = x3::rule<struct KeywordClz, std::string>{"keyword"} =
@@ -30,18 +71,23 @@ struct PriorityClz : x3::annotate_on_success, error_handler_base {};
 auto const priority = x3::rule<PriorityClz, char>{"priority"} =
     lexeme["[#" > char_("a-zA-Z") > ']'] > omit[*blank];
 
-struct TagsClz : x3::annotate_on_success, error_handler_base {};
-auto const tags = x3::rule<TagsClz, std::vector<std::string>>{
-    "tags"} = ':' > *(char_ - char_(" :")) % ':';
+// struct TagsClz : x3::annotate_on_success, error_handler_base {};
+// auto const tags = x3::rule<TagsClz, std::vector<std::string>>{
+//     "tags"} = ':' > *(char_ - char_(" :")) % ':';
 
+auto title_op = [](auto &ctx) {
+  auto &headline = x3::_val(ctx);
+  auto &title = x3::_attr(ctx);
+  auto result = extract_tags(title);
+  title.erase(result.second);
+  headline.tags = std::move(result.first);
+};
 struct TitleClz : x3::annotate_on_success, error_handler_base {};
-auto const title = x3::rule<TitleClz, std::string>{"title"} =
-    (+(char_ - eol)) - tags;
+auto const title = x3::rule<TitleClz, std::string>{"title"} = (+(char_ - eol));
 
 headline_t const headline{"headline"};
-
-auto const headline_def{stars > -keyword > -priority > -title > eol >
-                        org::content()};
+auto const headline_def{stars > -keyword > -priority > -(title[title_op]) > eol
+  > -org::section() > *headline};
 
 } // namespace headline
 

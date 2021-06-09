@@ -10,9 +10,8 @@ namespace org {
 
 namespace detail {
 template <typename Iterator, typename Parser>
-std::optional<typename Parser::attribute_type>
+optional<typename Parser::attribute_type>
 parse(Iterator &begin, Iterator end, Parser const &parser) {
-  static_assert(x3::traits::is_rule<Parser>::value, "Parser must is a rule");
   using attribute_type = typename Parser::attribute_type;
   attribute_type v;
 
@@ -26,7 +25,7 @@ parse(Iterator &begin, Iterator end, Parser const &parser) {
           v)) {
     return v;
   } else {
-    return std::nullopt;
+    return NULL_OPT;
   }
 }
 } // namespace detail

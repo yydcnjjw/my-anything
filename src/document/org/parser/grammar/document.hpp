@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stack>
+
 #include <org/parser/ast/ast.hpp>
 #include <org/parser/config.hpp>
 
@@ -8,14 +10,14 @@ namespace org {
 namespace grammar {
 
 struct DocumentClz;
-using document_t = x3::rule<DocumentClz, ast::Document>;
+using document_t = x3::rule<DocumentClz, ast::Document, true>;
 
 BOOST_SPIRIT_DECLARE(document_t);
 
 struct document_ctx_tag;
 template<typename Iterator>
 struct DocumentCtx {
-  std::size_t last_level{0};
+  std::stack<std::size_t> levels{{0}};
 };
 
 template <typename Iterator>

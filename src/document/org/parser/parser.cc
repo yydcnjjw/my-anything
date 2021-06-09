@@ -8,7 +8,6 @@
 #include <org/parser/grammar/paragraph_def.hpp>
 #include <org/parser/grammar/headline_def.hpp>
 #include <org/parser/grammar/section_def.hpp>
-#include <org/parser/grammar/content_def.hpp>
 #include <org/parser/grammar/document_def.hpp>
 #include <org/parser/parser.hpp>
 
