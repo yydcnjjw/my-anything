@@ -47,6 +47,5 @@ inline std::ostream &operator<<(std::ostream &os, Headline const &v) {
 } // namespace org
 } // namespace my
 
-// clang-format off
-BOOST_FUSION_ADAPT_STRUCT(my::org::ast::Headline, stars, keyword, priority, title, section, sub_headlines)
-// clang-format off
+BOOST_FUSION_ADAPT_STRUCT(my::org::ast::Headline, stars, keyword, priority,
+                          title, section, sub_headlines)

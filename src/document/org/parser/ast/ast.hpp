@@ -16,9 +16,7 @@ struct Document {
 
 inline std::ostream &operator<<(std::ostream &os, Document const &v) {
   os << "Document{\n";
-  if (v.section) {
-    os << v.section.value();
-  }
+  os << v.section;
 
   for (auto &headline : v.headlines) {
     os << headline;

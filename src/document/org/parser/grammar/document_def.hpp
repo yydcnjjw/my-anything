@@ -12,14 +12,8 @@ namespace grammar {
 using x3::eoi;
 using x3::eps;
 
-auto document_op = [](auto &ctx) {
-  auto &headline = x3::_attr(ctx);
-  std::cout << "doc: " << headline.title << std::endl;
-};
-
 document_t const document{"document"};
-auto const document_def = eps > -org::section() >
-                          *(org::headline() / document_op) > eoi;
+auto const document_def = eps > -org::section() > *org::headline() > eoi;
 
 BOOST_SPIRIT_DEFINE(document);
 

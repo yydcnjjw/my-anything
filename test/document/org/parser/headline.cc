@@ -11,7 +11,7 @@ auto parse_headline(std::string const &s) {
 } // namespace
 
 GTEST_TEST(org_parser_headline, headline) {
-  auto _headline = parse_headline("* TODO [#a] 我是:aa :a:b:c::\n");
+  auto _headline = parse_headline("* TODO [#a] 我是:aa :a:我:c::\n");
   ASSERT_TRUE(_headline);
   auto &headline = *_headline;
 
@@ -25,7 +25,7 @@ GTEST_TEST(org_parser_headline, headline) {
 
   ASSERT_EQ(headline.title, "我是:aa");
 
-  ASSERT_EQ(headline.tags, (std::vector<std::string>{"a", "b", "c"}));
+  ASSERT_EQ(headline.tags, (std::vector<std::string>{"a", "我", "c"}));
 }
 
 GTEST_TEST(org_parser_headline, starts) {
