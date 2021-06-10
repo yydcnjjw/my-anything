@@ -1,6 +1,6 @@
 #pragma once
 
-#include <org/parser/ast/types.hpp>
+#include <org/ast/types.hpp>
 
 namespace my {
 

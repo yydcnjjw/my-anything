@@ -1,5 +1,7 @@
 #pragma once
-#include <org/parser/ast/data_type.hpp>
+
+#include <org/ast/data_type.hpp>
+
 #include <string>
 #include <vector>
 

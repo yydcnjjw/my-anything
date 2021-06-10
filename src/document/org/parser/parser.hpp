@@ -1,6 +1,6 @@
 #pragma once
 
-#include <org/parser/ast/ast.hpp>
+#include <org/ast/ast.hpp>
 #include <org/parser/config.hpp>
 #include <org/parser/error_handler.hpp>
 #include <org/parser/grammar/document.hpp>
@@ -47,38 +47,6 @@ auto parse(std::istream &is, Parser const &parser) {
 template <typename T> auto parse_document(T &t) {
   return parse(t, org::document());
 }
-
-// struct element_visitor : public boost::static_visitor<> {
-
-//   Document &doc;
-//   std::stack<ast::Headline *> headline_ctx;
-
-//   element_visitor(Document &doc) : doc(doc) {}
-
-//   void operator()(ast::Headline &e) {
-//     if (headline_ctx.empty()) {
-//       headline_ctx.push(&e);
-//       doc.content.headlines.push_back(&e);
-//     } else {
-//       auto cur = headline_ctx.top();
-//       if (cur->stars().length() < e.stars().length()) {
-//         headline_ctx.push(&e);
-//         cur->content.headlines.push_back(&e);
-//       } else {
-//         headline_ctx.pop();
-//         operator()(e);
-//       }
-//     }
-//   }
-
-//   void operator()(ast::Section &e) {
-//     if (headline_ctx.empty()) {
-//       doc.content.section.emplace(&e);
-//     } else {
-//       headline_ctx.top()->content.section.emplace(&e);
-//     }
-//   }
-// };
 
 } // namespace org
 

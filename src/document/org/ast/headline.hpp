@@ -1,7 +1,7 @@
 #pragma once
 
-#include <org/parser/ast/data_type.hpp>
-#include <org/parser/ast/section.hpp>
+#include <org/ast/data_type.hpp>
+#include <org/ast/section.hpp>
 
 namespace my {
 namespace org {

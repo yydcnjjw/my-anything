@@ -1,5 +1,7 @@
 #pragma once
-#include <org/parser/ast/data_type.hpp>
+
+#include <org/ast/data_type.hpp>
+
 #include <string>
 #include <vector>
 
@@ -14,11 +16,8 @@ struct Paragraph : ElementData {
 };
 
 inline std::ostream &operator<<(std::ostream &os, Paragraph const &v) {
-  os << " "
-     << "Paragraph{\n";
-  os << " " << v.content;
-  os << " "
-     << "}\n";
+
+  os << "Paragraph{" << v.content << "}\n";
   return os;
 }
 

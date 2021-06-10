@@ -1,6 +1,6 @@
 #pragma once
 
-#include <org/parser/ast/ast.hpp>
+#include <org/ast/ast.hpp>
 #include <org/parser/config.hpp>
 
 namespace my {

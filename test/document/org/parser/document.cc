@@ -6,22 +6,24 @@
 using my::org::ast::Document;
 using my::org::parse_document;
 
-// GTEST_TEST(org_parser_document, document_string) {
+GTEST_TEST(org_parser_document, document_string) {
 
-//   std::ifstream ifs{"document_test.org"};
+  std::ifstream ifs{"document_test.org"};
 
-//   std::stringstream oss;
+  std::stringstream oss;
 
-//   oss << ifs.rdbuf();
+  oss << ifs.rdbuf();
 
-//   auto s = oss.str();
+  auto s = oss.str();
 
-//   auto ast = parse_document(s);
+  auto ast = parse_document(s);
 
-//   ASSERT_TRUE(ast);
+  ASSERT_TRUE(ast);
+  
+  my::org::generator::print_ast(std::cout, ast);
 
-//   std::cout << ast.value() << std::endl;
-// }
+  // std::cout << ast.value() << std::endl;
+}
 
 GTEST_TEST(org_parser_document, document_stream) {
 
@@ -30,5 +32,7 @@ GTEST_TEST(org_parser_document, document_stream) {
 
   ASSERT_TRUE(ast);
 
-  std::cout << ast.value() << std::endl;
+  my::org::generator::print_ast(std::cout, ast);  
+
+  // std::cout << ast.value() << std::endl;
 }

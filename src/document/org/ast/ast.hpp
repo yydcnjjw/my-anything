@@ -1,19 +1,19 @@
 #pragma once
 
-#include <org/parser/ast/types.hpp>
-#include <org/parser/ast/section.hpp>
-#include <org/parser/ast/headline.hpp>
+#include <org/ast/types.hpp>
+#include <org/ast/section.hpp>
+#include <org/ast/headline.hpp>
 
 namespace my {
 
 namespace org {
 namespace ast {
 
-struct Document {
+struct Document : x3::position_tagged {
   optional<Section> section;
   std::list<Headline> headlines;
 };
-
+  
 inline std::ostream &operator<<(std::ostream &os, Document const &v) {
   os << "Document{\n";
   os << v.section;
@@ -24,7 +24,7 @@ inline std::ostream &operator<<(std::ostream &os, Document const &v) {
   os << "}\n";
   return os;
 }
-  
+
 } // namespace ast
   
 } // namespace org
