@@ -6,7 +6,7 @@ namespace x3 = boost::spirit::x3;
 int main(int argc, char *argv[]) {
 
   using x3::char_;
-  std::string s{R"(:b:c:)"};
+  std::string s{R"(aaaa :b:c:)"};
 
   auto const tags = ':' > +(char_ - char_(":")) % ':';
   auto const title = (+char_) - tags;

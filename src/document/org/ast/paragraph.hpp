@@ -6,20 +6,12 @@
 #include <vector>
 
 namespace my {
-
 namespace org {
 namespace ast {
 
-// TODO: 标记元素类型
 struct Paragraph : ElementData {
   std::string content;
 };
-
-inline std::ostream &operator<<(std::ostream &os, Paragraph const &v) {
-
-  os << "Paragraph{" << v.content << "}\n";
-  return os;
-}
 
 } // namespace ast
 } // namespace org

@@ -21,8 +21,6 @@ GTEST_TEST(org_parser_document, document_string) {
   ASSERT_TRUE(ast);
   
   my::org::generator::print_ast(std::cout, ast);
-
-  // std::cout << ast.value() << std::endl;
 }
 
 GTEST_TEST(org_parser_document, document_stream) {
@@ -33,6 +31,4 @@ GTEST_TEST(org_parser_document, document_stream) {
   ASSERT_TRUE(ast);
 
   my::org::generator::print_ast(std::cout, ast);  
-
-  // std::cout << ast.value() << std::endl;
 }

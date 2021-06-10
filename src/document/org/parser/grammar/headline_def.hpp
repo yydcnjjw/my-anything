@@ -71,23 +71,27 @@ struct PriorityClz : x3::annotate_on_success, error_handler_base {};
 auto const priority = x3::rule<PriorityClz, char>{"priority"} =
     lexeme["[#" > char_("a-zA-Z") > ']'] > omit[*blank];
 
-// struct TagsClz : x3::annotate_on_success, error_handler_base {};
-// auto const tags = x3::rule<TagsClz, std::vector<std::string>>{
-//     "tags"} = ':' > *(char_ - char_(" :")) % ':';
+struct TagsClz : x3::annotate_on_success, error_handler_base {};
+auto const tags = x3::rule<TagsClz, std::vector<std::string>>{
+  "tags"} = x3::attr(std::vector<std::string>{});
 
-auto title_op = [](auto &ctx) {
+auto tags_op = [](auto &ctx) {
   auto &headline = x3::_val(ctx);
-  auto &title = x3::_attr(ctx);
+  auto &title = headline.title;
+  auto &tags = x3::_attr(ctx);
+
   auto result = extract_tags(title);
   title.erase(result.second);
-  headline.tags = std::move(result.first);
+  tags = std::move(result.first);
 };
+
 struct TitleClz : x3::annotate_on_success, error_handler_base {};
 auto const title = x3::rule<TitleClz, std::string>{"title"} = (+(char_ - eol));
 
 headline_t const headline{"headline"};
-auto const headline_def{stars > -keyword > -priority > -(title[title_op]) > eol
-  > -org::section() > *headline};
+auto const headline_def{stars > -keyword > -priority > -title >
+                        tags[tags_op] > eol >
+                        -org::section() > *headline};
 
 } // namespace headline
 

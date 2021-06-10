@@ -5,7 +5,6 @@
 #include <org/ast/paragraph.hpp>
 
 namespace my {
-
 namespace org {
 namespace ast {
 
@@ -27,15 +26,6 @@ struct Section : GreaterElementData {
 
   std::list<SubElement> elements;
 };
-
-inline std::ostream &operator<<(std::ostream &os, Section const &v) {
-  os << " " << "Section{\n";
-  for (auto &e : v.elements) {
-    boost::apply_visitor([&](auto &v) { os << v; }, e);
-  }
-  os << " " << "}\n";
-  return os;
-}
 
 } // namespace ast
 } // namespace org
