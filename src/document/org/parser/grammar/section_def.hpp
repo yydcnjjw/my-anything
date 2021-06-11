@@ -1,6 +1,6 @@
 #pragma once
 
-#include <org/parser/grammar/greater_block.hpp>
+#include <org/parser/grammar/block.hpp>
 #include <org/parser/grammar/headline.hpp>
 #include <org/parser/grammar/paragraph.hpp>
 #include <org/parser/grammar/section.hpp>
@@ -20,7 +20,8 @@ auto const headline_header = (+char_('*') > ' ' > *(char_ - eol) > eol);
   
 x3::rule<struct SectionSubElementClz, ast::Section::SubElement> const
     section_sub_element{"section_sub_element"};
-auto const section_sub_element_def = org::greater_block() | org::paragraph();
+auto const section_sub_element_def =
+    org::greater_block() | org::dynamic_block() | org::paragraph();
 
 BOOST_SPIRIT_DEFINE(section_sub_element);
 

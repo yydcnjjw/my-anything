@@ -1,6 +1,7 @@
 add_executable(org_test
   parser/document.cc
   parser/headline.cc
+  parser/block.cc
   )
 
 target_link_libraries(org_test

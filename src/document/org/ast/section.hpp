@@ -1,7 +1,7 @@
 #pragma once
 
 #include <org/ast/data_type.hpp>
-#include <org/ast/greater_block.hpp>
+#include <org/ast/block.hpp>
 #include <org/ast/paragraph.hpp>
 
 namespace my {
