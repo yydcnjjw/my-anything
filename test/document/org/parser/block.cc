@@ -32,6 +32,24 @@ GTEST_TEST(org_parser_block, greater_block) {
 )");
 }
 
+GTEST_TEST(org_parser_block, greater_block_whitespace) {
+  auto block = parse_greater_block(R"(  #+begin_src p1 p2 p3
+  fasfasdfasfasdf
+  sdfasf asdf
+  asdf
+  af
+  #+end_src   
+)");
+  ASSERT_TRUE(block);
+  ASSERT_EQ(block->name, "src");
+  ASSERT_EQ(block->parameters, (std::vector<std::string>{"p1", "p2", "p3"}));
+  ASSERT_EQ(block->content, R"(  fasfasdfasfasdf
+  sdfasf asdf
+  asdf
+  af
+)");
+}
+
 GTEST_TEST(org_parser_block, greater_block_name) {
   auto block = parse_greater_block(R"(#+begin_src p1 p2 p3
 #+end_src1

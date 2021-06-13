@@ -18,8 +18,8 @@ using x3::string;
 
 namespace block {
 
-auto const begin{lit("#+begin")};
-auto const end{lit("#+end")};
+auto const begin{*lit(' ') >> lit("#+begin")};
+auto const end{*lit(' ') >> lit("#+end")};
 auto const name{+(char_ - char_(' ') - eol)};
 auto const param{+(char_ - char_(' ') - eol)};
 auto const param_list{param % +char_(' ')};
@@ -37,7 +37,7 @@ greater_block_t const greater_block{"greater_block"};
 auto const greater_block_def{
   begin > lit('_') > name > ((+lit(' ') > param_list > eol) | eol)
     > content >
-  end > lit('_') > omit[name[name_check]] > eol
+  end > lit('_') > omit[name[name_check]] >> *lit(' ') > eol
 };
 // clang-format off
   
