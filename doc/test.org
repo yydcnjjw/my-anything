@@ -10,7 +10,11 @@ section2
 ** headline11
 这是什么
 
-* headline2                                                  :sfasfa:aa:b:
+* headline2                                                  :测试:aa:b:
+:PROPERTIES:
+:CATEGORY: aaaa
+:END:
+
 asfds
 ** headline21
 #+begin_src cpp

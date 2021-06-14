@@ -6,6 +6,7 @@
 #include <org/parser/grammar/common_def.hpp>
 #include <org/parser/grammar/document_def.hpp>
 #include <org/parser/grammar/block_def.hpp>
+#include <org/parser/grammar/drawer_def.hpp>
 #include <org/parser/grammar/headline_def.hpp>
 #include <org/parser/grammar/paragraph_def.hpp>
 #include <org/parser/grammar/section_def.hpp>

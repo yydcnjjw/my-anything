@@ -3,8 +3,7 @@
 #include <boost/regex/icu.hpp>
 #include <ranges>
 
-#include <boost/mpl/not.hpp>
-
+#include <org/parser/grammar/common.hpp>
 #include <org/parser/grammar/headline.hpp>
 #include <org/parser/grammar/section.hpp>
 
@@ -14,7 +13,8 @@ namespace org {
 namespace grammar {
 
 inline auto extract_tags(std::string const &s) {
-  static auto const r = boost::make_u32regex("[ \t]+(:[[:alnum:]_@#%:]+:)[ \t]*$");
+  static auto const r =
+      boost::make_u32regex("[ \t]+(:[[:alnum:]_@#%:]+:)[ \t]*$");
   std::vector<std::string> tags;
   boost::smatch m;
   boost::smatch::difference_type pos{0};
@@ -44,8 +44,9 @@ using x3::eol;
 using x3::lexeme;
 using x3::omit;
 using x3::raw;
-  
+
 namespace headline {
+
 auto stars_op = [](auto &ctx) {
   auto curlevel = x3::_attr(ctx).size();
   auto &doc_ctx = x3::get<document_ctx_tag>(ctx).get();
@@ -72,8 +73,8 @@ auto const priority = x3::rule<PriorityClz, char>{"priority"} =
     lexeme["[#" > char_("a-zA-Z") > ']'] > omit[*blank];
 
 struct TagsClz : x3::annotate_on_success, error_handler_base {};
-auto const tags = x3::rule<TagsClz, std::vector<std::string>>{
-  "tags"} = x3::attr(std::vector<std::string>{});
+auto const tags = x3::rule<TagsClz, std::vector<std::string>>{"tags"} =
+    x3::attr(std::vector<std::string>{});
 
 auto tags_op = [](auto &ctx) {
   auto &headline = x3::_val(ctx);
@@ -86,12 +87,11 @@ auto tags_op = [](auto &ctx) {
 };
 
 struct TitleClz : x3::annotate_on_success, error_handler_base {};
-auto const title = x3::rule<TitleClz, std::string>{"title"} = (+(char_ - eol));
+auto const title = x3::rule<TitleClz, std::string>{"title"} = (+(any - eol));
 
 headline_t const headline{"headline"};
-auto const headline_def{stars > -keyword > -priority > -title >
-                        tags[tags_op] > eol >
-                        -org::section() > *headline};
+auto const headline_def{stars > -keyword > -priority > -title > tags[tags_op] >
+                        eol > -org::section() > *headline};
 
 } // namespace headline
 

@@ -20,8 +20,8 @@ namespace block {
 
 auto const begin{*lit(' ') >> lit("#+begin")};
 auto const end{*lit(' ') >> lit("#+end")};
-auto const name{+(char_ - char_(' ') - eol)};
-auto const param{+(char_ - char_(' ') - eol)};
+auto const name{+(any - char_(' ') - eol)};
+auto const param{+(any - char_(' ') - eol)};
 auto const param_list{param % +char_(' ')};
 auto const content{*(org::line() - end)};
 
