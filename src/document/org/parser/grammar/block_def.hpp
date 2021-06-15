@@ -9,45 +9,57 @@ namespace org {
 
 namespace grammar {
 
+namespace block {
+
 using x3::char_;
 using x3::eol;
 using x3::lit;
 using x3::no_case;
 using x3::omit;
 using x3::string;
+using x3::space;
 
-namespace block {
-
-auto const begin{*lit(' ') >> lit("#+begin")};
-auto const end{*lit(' ') >> lit("#+end")};
-auto const name{+(any - char_(' ') - eol)};
-auto const param{+(any - char_(' ') - eol)};
-auto const param_list{param % +char_(' ')};
-auto const content{*(org::line() - end)};
+auto const begin{lit("#+begin")};
+auto const end{lit("#+end")};
+auto const name{+(any - space)};
+auto const param{+(any - space)};
+auto const param_list{param % blank};
 
 auto name_check = [](auto &ctx) {
   auto &greater_block = x3::_val(ctx);
   auto &name = x3::_attr(ctx);
   x3::_pass(ctx) = greater_block.name == name;
 };
+
+auto const greater_begin_line =
+    blank_eol_block(begin > lit('_') > name > -(plus_blank > param_list));
+auto const greater_end_line =
+    blank_eol_block(end > lit('_') > omit[name[name_check]]);
+auto const greater_content{*(org::line() - greater_end_line)};
   
 greater_block_t const greater_block{"greater_block"};  
 
 // clang-format off
 auto const greater_block_def{
-  begin > lit('_') > name > ((+lit(' ') > param_list > eol) | eol)
-    > content >
-  end > lit('_') > omit[name[name_check]] >> *lit(' ') > eol
+  greater_begin_line
+    > greater_content >
+  greater_end_line
 };
 // clang-format off
-  
+
+auto const dynamic_begin_line =
+  blank_eol_block(begin > lit(':') > plus_blank > name > -(plus_blank > param_list));
+auto const dynamic_end_line =
+    blank_eol_block(end > lit(':'));
+auto const dynamic_content{*(org::line() - dynamic_end_line)};
+
 dynamic_block_t const dynamic_block{"dynamic_block"};
 
 // clang-format off
 auto const dynamic_block_def{
-  begin > lit(':') > +lit(' ') > name > ((+lit(' ') > param_list > eol) | eol)
-    > content >
-  end > lit(':') >> *lit(' ') > eol
+  dynamic_begin_line
+    > dynamic_content >
+  dynamic_end_line
 };
 // clang-format off
 

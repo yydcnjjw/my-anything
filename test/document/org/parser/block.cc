@@ -38,7 +38,7 @@ GTEST_TEST(org_parser_block, greater_block_whitespace) {
   sdfasf asdf
   asdf
   af
-  #+end_src   
+  #+end_src    
 )");
   ASSERT_TRUE(block);
   ASSERT_EQ(block->name, "src");

@@ -15,8 +15,8 @@ using x3::no_case;
 namespace drawer {
 
 auto const name = +(word | x3::char_('-'));
-auto const begin = ':' > name > ':' > eol;
-auto const end = no_case[":end:"];
+auto const begin = blank_eol_block(':' > name > ':');
+auto const end = blank_eol_block(no_case[":end:"]);
 auto const content = *(org::line() - end);
 
 drawer_t const drawer{"drawer"};

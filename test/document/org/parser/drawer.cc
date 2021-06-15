@@ -15,7 +15,24 @@ GTEST_TEST(org_parser_drawer, drawer) {
 fasdfsf
 fadsfsa
 df
-:end:)");
+:end:
+)");
+
+  ASSERT_TRUE(drawer);
+  ASSERT_EQ((*drawer).name, "te-_st");
+  ASSERT_EQ((*drawer).content, R"(fasdfsf
+fadsfsa
+df
+)");
+}
+
+GTEST_TEST(org_parser_drawer, drawer_blank) {
+  auto drawer = parse_drawer(R"(  :te-_st:  
+fasdfsf
+fadsfsa
+df
+  :end: 
+)");
 
   ASSERT_TRUE(drawer);
   ASSERT_EQ((*drawer).name, "te-_st");

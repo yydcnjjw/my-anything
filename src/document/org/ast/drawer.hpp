@@ -1,8 +1,3 @@
-// drawer = drawer-begin-line <eol> line* <drawer-end-line>
-// drawer-begin-line = <':'> drawer-name <':'> [s]
-// drawer-name = #"[-\w]+"
-// drawer-end-line = <':END:'> [s]
-
 #pragma once
 
 #include <org/ast/data_type.hpp>

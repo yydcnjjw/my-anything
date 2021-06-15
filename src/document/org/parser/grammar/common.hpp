@@ -6,11 +6,24 @@ namespace my {
 namespace org {
 namespace grammar {
 
+using x3::ascii::blank;
+  
 using line_t = x3::rule<struct LineClz, std::string>;
 BOOST_SPIRIT_DECLARE(line_t);
   
-auto const word = x3::alnum | x3::char_('_');
-auto const any = x3::char_;
+auto constexpr word = x3::alnum | x3::char_('_'); // "\w"
+auto constexpr any = x3::char_;                   // "."
+
+decltype(auto) constexpr blank_block(auto &&subject) {
+  return x3::omit[*blank] >> subject >> x3::omit[*blank];
+}
+
+decltype(auto) constexpr blank_eol_block(auto &&subject) {
+  return x3::omit[*blank] >> subject >> x3::omit[*blank] > x3::eol;
+}
+
+auto constexpr kleene_blank = x3::omit[*blank];
+auto constexpr plus_blank = x3::omit[+blank];
 
 } // namespace grammar
 
