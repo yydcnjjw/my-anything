@@ -1,30 +1,26 @@
 #pragma once
 
-#include <org/parser/grammar/common.hpp>
 #include <org/parser/grammar/block.hpp>
+#include <org/parser/grammar/common.hpp>
 #include <org/parser/grammar/drawer.hpp>
+#include <org/parser/grammar/footnote.hpp>
 #include <org/parser/grammar/headline.hpp>
 #include <org/parser/grammar/paragraph.hpp>
 #include <org/parser/grammar/section.hpp>
 
 namespace my {
 namespace org {
-
 namespace grammar {
-
-using x3::char_;
-using x3::eoi;
-using x3::eol;
-
 namespace section {
 
-auto const headline_header = (+char_('*') > ' ' > *(any - eol) > eol);
+using x3::char_;
+using x3::eol;
 
 x3::rule<struct SectionSubElementClz, ast::Section::SubElement> const
     section_sub_element{"section_sub_element"};
 auto const section_sub_element_def = org::greater_block() |
                                      org::dynamic_block() | org::drawer() |
-                                     org::paragraph();
+                                     org::footnote_def() | org::paragraph();
 
 BOOST_SPIRIT_DEFINE(section_sub_element);
 section_t const section{"section"};

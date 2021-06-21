@@ -38,8 +38,6 @@ inline auto extract_tags(std::string const &s) {
 
 namespace headline {
 
-using x3::char_;
-using x3::eol;
 using x3::lexeme;
 using x3::omit;
 using x3::raw;

@@ -1,18 +1,11 @@
 #pragma once
 
 #include <org/parser/grammar/common.hpp>
-#include <org/parser/grammar/headline.hpp>
 #include <org/parser/grammar/paragraph.hpp>
 
 namespace my {
 namespace org {
-
 namespace grammar {
-
-using x3::char_;
-using x3::eoi;
-using x3::eol;
-
 namespace paragraph {
 
 paragraph_t const paragraph{"paragraph"};

@@ -3,6 +3,7 @@
 #include <org/ast/block.hpp>
 #include <org/ast/data_type.hpp>
 #include <org/ast/drawer.hpp>
+#include <org/ast/footnote.hpp>
 #include <org/ast/paragraph.hpp>
 
 namespace my {
@@ -10,8 +11,8 @@ namespace org {
 namespace ast {
 
 struct Section : GreaterElementData {
-  struct SubElement
-      : x3::variant<GreaterBlock, DynamicBlock, Drawer, Paragraph> {
+  struct SubElement : x3::variant<GreaterBlock, DynamicBlock, Drawer,
+                                  FootnoteDef, Paragraph> {
     using base_type::base_type;
     using base_type::operator=;
   };

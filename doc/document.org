@@ -1,6 +1,1 @@
-:我:
-:CATEGORY: aaa
-#+begin_center
-#+end_center
-
-:END:
+[fn:1]
