@@ -2,6 +2,7 @@
 
 #include <org/ast/data_type.hpp>
 #include <org/ast/element.hpp>
+#include <org/ast/greater_element.hpp>
 #include <org/ast/paragraph.hpp>
 
 namespace my {
