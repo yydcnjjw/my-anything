@@ -2,6 +2,7 @@
 
 #include <org/parser/grammar/common.hpp>
 #include <org/parser/grammar/footnote.hpp>
+#include <org/parser/grammar/headline.hpp>
 
 namespace my {
 namespace org {
@@ -13,10 +14,10 @@ auto const label = x3::rule<struct _, std::string>{"label"} =
 auto const footnote_def_head =
     x3::rule<struct _, std::string>{"footnote_def_head"} = "[fn:" > label > "]";
 auto const content = x3::rule<struct _, std::string>{"content"} =
-    *(org::line() - footnote_def_head);
+    *(org::line() - footnote_def_head - headline_header);
 
 footnote_def_t const footnote_def{"footnote_def"};
-auto const footnote_def_def = footnote_def_head >> content;
+auto const footnote_def_def = footnote_def_head > content;
 
 } // namespace footnote
 

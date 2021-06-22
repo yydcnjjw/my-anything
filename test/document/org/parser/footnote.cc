@@ -43,3 +43,27 @@ asdfafafafa
 f
 af)");
 }
+
+GTEST_TEST(org_parser_footnote, footnote_def_headline) {
+  auto footnote_def = parse_footnote_def(R"([fn:1_a-B]fasfaf
+asfasf
+* headline)");
+
+  ASSERT_TRUE(footnote_def);
+  ASSERT_EQ((*footnote_def).label, "1_a-B");
+  ASSERT_EQ((*footnote_def).content, R"(fasfaf
+asfasf
+)");
+}
+
+GTEST_TEST(org_parser_footnote, footnote_def_multifootnote) {
+  auto footnote_def = parse_footnote_def(R"([fn:1_a-B]fasfaf
+asfasf
+* headline)");
+
+  ASSERT_TRUE(footnote_def);
+  ASSERT_EQ((*footnote_def).label, "1_a-B");
+  ASSERT_EQ((*footnote_def).content, R"(fasfaf
+asfasf
+)");
+}

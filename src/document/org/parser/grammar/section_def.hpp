@@ -1,9 +1,8 @@
 #pragma once
 
-#include <org/parser/grammar/block.hpp>
+
 #include <org/parser/grammar/common.hpp>
-#include <org/parser/grammar/drawer.hpp>
-#include <org/parser/grammar/footnote.hpp>
+#include <org/parser/grammar/element.hpp>
 #include <org/parser/grammar/headline.hpp>
 #include <org/parser/grammar/paragraph.hpp>
 #include <org/parser/grammar/section.hpp>
@@ -16,11 +15,9 @@ namespace section {
 using x3::char_;
 using x3::eol;
 
-x3::rule<struct SectionSubElementClz, ast::Section::SubElement> const
+x3::rule<struct SectionSubElementClz, ast::Section::sub_element_t> const
     section_sub_element{"section_sub_element"};
-auto const section_sub_element_def = org::greater_block() |
-                                     org::dynamic_block() | org::drawer() |
-                                     org::footnote_def() | org::paragraph();
+auto const section_sub_element_def = greater_element | element;
 
 BOOST_SPIRIT_DEFINE(section_sub_element);
 section_t const section{"section"};

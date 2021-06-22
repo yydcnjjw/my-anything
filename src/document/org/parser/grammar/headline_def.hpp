@@ -87,7 +87,7 @@ auto const title = x3::rule<TitleClz, std::string>{"title"} = (+(any - eol));
 headline_t const headline{"headline"};
 auto const headline_def{stars > plus_blank > -(keyword > plus_blank) >
                         -(priority > kleene_blank) > -title > tags[tags_op] >
-                        eol > -org::section() > *headline};
+                        (eol | eoi) > -org::section() > *headline};
 
 } // namespace headline
 

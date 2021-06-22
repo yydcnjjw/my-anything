@@ -30,8 +30,6 @@ decltype(auto) constexpr blank_eol_block(auto &&subject) {
 
 auto constexpr kleene_blank = x3::omit[*blank];
 auto constexpr plus_blank = x3::omit[+blank];
-
-auto constexpr headline_header = (+char_('*') > ' ' > *(any - eol) > eol);
   
 } // namespace grammar
 

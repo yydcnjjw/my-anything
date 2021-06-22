@@ -7,9 +7,9 @@ namespace org {
 namespace grammar {
 
 line_t line{"line"};
-auto const crlf = (-char_('\r') > char_('\n'));
+auto const crlf = (-char_('\r') >> char_('\n'));
 // clang-format off
-auto const line_def = (+(any - eol - eoi) > (eoi | crlf)) | crlf;
+auto const line_def = (+(any - eol) >> (crlf | eoi)) | crlf;
 // clang-format off
 struct LineClz : x3::annotate_on_success, error_handler_base {};
 

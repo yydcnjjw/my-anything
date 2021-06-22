@@ -55,3 +55,17 @@ GTEST_TEST(org_parser_headline, optional) {
   ASSERT_EQ(headline.title, "我是:aa");
   ASSERT_EQ(headline.tags, (std::vector<std::string>{"a", "b", "c"}));
 }
+
+GTEST_TEST(org_parser_headline, no_eol) {
+  auto _headline = parse_headline("* 我是:aa :a:b:c::");
+  ASSERT_TRUE(_headline);
+  auto &headline = *_headline;
+
+  ASSERT_EQ(headline.stars, "*");
+
+  ASSERT_FALSE(headline.keyword);
+  ASSERT_FALSE(headline.priority);
+
+  ASSERT_EQ(headline.title, "我是:aa");
+  ASSERT_EQ(headline.tags, (std::vector<std::string>{"a", "b", "c"}));
+}
