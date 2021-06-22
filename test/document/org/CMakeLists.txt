@@ -3,6 +3,7 @@ add_executable(org_test
   parser/headline.cc
   parser/block.cc
   parser/drawer.cc
+  parser/footnote.cc
   )
 
 target_link_libraries(org_test

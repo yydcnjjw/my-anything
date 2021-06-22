@@ -38,8 +38,6 @@ inline auto extract_tags(std::string const &s) {
 
 namespace headline {
 
-using x3::char_;
-using x3::eol;
 using x3::lexeme;
 using x3::omit;
 using x3::raw;
@@ -89,7 +87,7 @@ auto const title = x3::rule<TitleClz, std::string>{"title"} = (+(any - eol));
 headline_t const headline{"headline"};
 auto const headline_def{stars > plus_blank > -(keyword > plus_blank) >
                         -(priority > kleene_blank) > -title > tags[tags_op] >
-                        eol > -org::section() > *headline};
+                        (eol | eoi) > -org::section() > *headline};
 
 } // namespace headline
 

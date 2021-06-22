@@ -14,5 +14,5 @@ template <typename T> using optional = boost::optional<T>;
 
 #define NULL_OPT boost::none;
 
-}
+} // namespace org
 } // namespace my

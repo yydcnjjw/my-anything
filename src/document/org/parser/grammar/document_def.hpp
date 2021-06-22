@@ -9,11 +9,8 @@ namespace org {
 
 namespace grammar {
 
-using x3::eoi;
-using x3::eps;
-
 document_t const document{"document"};
-auto const document_def = eps > -org::section() > *org::headline() > eoi;
+auto const document_def = -org::section() > *org::headline();
 
 BOOST_SPIRIT_DEFINE(document);
 

@@ -10,6 +10,7 @@
 #include <org/parser/grammar/headline_def.hpp>
 #include <org/parser/grammar/paragraph_def.hpp>
 #include <org/parser/grammar/section_def.hpp>
+#include <org/parser/grammar/footnote_def.hpp>
 #include <org/parser/parser.hpp>
 
 namespace my {

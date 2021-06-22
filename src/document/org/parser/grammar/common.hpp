@@ -7,7 +7,13 @@ namespace org {
 namespace grammar {
 
 using x3::ascii::blank;
-  
+using x3::char_;
+using x3::eol;
+using x3::eoi;
+using x3::lit;
+using x3::no_case;
+using x3::omit;
+
 using line_t = x3::rule<struct LineClz, std::string>;
 BOOST_SPIRIT_DECLARE(line_t);
   
@@ -24,7 +30,7 @@ decltype(auto) constexpr blank_eol_block(auto &&subject) {
 
 auto constexpr kleene_blank = x3::omit[*blank];
 auto constexpr plus_blank = x3::omit[+blank];
-
+  
 } // namespace grammar
 
 grammar::line_t const &line();
