@@ -6,7 +6,29 @@
 #include <boost/mpl/range_c.hpp>
 #include <boost/spirit/home/x3/support/traits/attribute_category.hpp>
 #include <boost/spirit/home/x3/support/traits/is_variant.hpp>
+#include <boost/spirit/home/x3/support/ast/variant.hpp>
 #include <boost/type_index.hpp>
+
+namespace boost {
+namespace spirit {
+namespace x3 {
+namespace traits {
+
+template <typename T, typename Enable = void>
+struct is_forward_ast : mpl::false_ {};
+
+template <typename T> struct is_forward_ast<x3::forward_ast<T>> : mpl::true_ {};
+
+struct forward_ast_attribute {};
+template <typename T>
+struct attribute_category<T,
+                          typename enable_if<traits::is_forward_ast<T>>::type>
+    : mpl::identity<forward_ast_attribute> {};
+}
+} // namespace x3
+} // namespace spirit
+} // namespace boost
+
 
 namespace my {
 namespace org {
@@ -22,6 +44,11 @@ using namespace boost::spirit::x3;
 template <typename Out, typename T>
 inline void print_attribute(Out &out, T const &val, traits::plain_attribute) {
   out << val;
+}
+
+template <typename Out, typename T>
+inline void print_attribute(Out &out, T const &val, traits::forward_ast_attribute) {
+  print_ast(out, val.get());
 }
 
 template <typename Out, typename T>
