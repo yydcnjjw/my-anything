@@ -71,7 +71,7 @@ Thumbs.db
 *.dll
 *.exe
 
-/debug/
+/build-*/
 /.ccls-cache/
 /compile_commands.json
 /CMakeLists.txt.user
