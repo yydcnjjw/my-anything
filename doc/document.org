@@ -1,12 +1,23 @@
-[fn:111] afas
-fsa
-df
+2. [@2] [ ] aaa
+3. 
+2. [@2] [-] a :: aa
+   - [X] af
+   - [ ]
+3. a :: [X] aa
+
+(org-element-parse-buffer)
+#+begin_src emacs-lisp :tangle yes
+  (let* ((data (org-element-parse-buffer))
+         (elements (caddr data))
+         (plainlist (car (org-element-contents elements))))
+  (org-element-contents plainlist)
+  
+    )
+#+end_src
+
+#+RESULTS:
+| item | (:bullet -  :begin 1 :end 41 :contents-begin 17 :contents-end 41 :checkbox off :counter 2 :structure ((1 0 -  2 [ ] a 41) (20 3 -  nil [X] nil 32) (32 3 -  nil [ ] nil 41) (41 0 3.  nil nil nil 56)) :pre-blank 0 :post-blank 0 :post-affiliated 1 :tag (a) :parent (plain-list (:type descriptive :begin 1 :end 57 :contents-begin 1 :contents-end 56 :structure ((1 0 -  2 [ ] a 41) (20 3 -  nil [X] nil 32) (32 3 -  nil [ ] nil 41) (41 0 3.  nil nil nil 56)) :post-blank 1 :post-affiliated 1 :parent (section (:begin 1 :end 1102 :contents-begin 1 :contents-end 1098 :post-blank 4 :post-affiliated 1 :parent (org-data nil #3)) #1 (paragraph (:begin 57 :end 84 :contents-begin 57 :contents-end 84 :post-blank 0 :post-affiliated 57 :parent #3) (org-element-parse-buffer) |
 
 
-(org-data nil
-(section (:begin 1 :end 23 :contents-begin 1 :contents-end 22 :post-blank 1 :post-affiliated 1 ...)
-(footnote-definition (:label "111" :begin 1 :end 22 :contents-begin 10 :contents-end 22 :pre-blank 0 ...)
- (paragraph ... #("afas
-fsa
-df
-" 0 12 ...)))))
+
+

@@ -18,6 +18,7 @@ struct document_ctx_tag;
 template<typename Iterator>
 struct DocumentCtx {
   std::stack<std::size_t> levels{{0}};
+  ssize_t cur_item_level{-1};
 };
 
 template <typename Iterator>
